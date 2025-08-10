@@ -137,6 +137,33 @@ app.run(debug=True, host='0.0.0.0', port=8000)
 ### Problemas con CSV
 Si el archivo CSV se corrompe, simplemente eliminarlo. La aplicación creará uno nuevo automáticamente.
 
+## Despliegue en Render
+
+### Método 1: Usando GitHub (Recomendado)
+1. **Subir código a GitHub**:
+   - Crear repositorio en GitHub
+   - Subir todos los archivos del proyecto
+2. **Conectar con Render**:
+   - Ir a [render.com](https://render.com) y crear cuenta
+   - Conectar tu repositorio de GitHub
+   - Render detectará automáticamente que es una app Flask
+
+### Método 2: Deploy directo
+1. **Ir a Render.com** y crear nueva Web Service
+2. **Configurar**:
+   - Runtime: Python 3
+   - Build Command: `pip install -r requirements.txt`
+   - Start Command: `gunicorn app:app`
+3. **Variables de entorno**:
+   - `PYTHON_VERSION`: 3.11.0
+   - `FLASK_ENV`: production
+
+### Archivos de configuración incluidos:
+- `render.yaml`: Configuración automática para Render
+- `Procfile`: Comando de inicio alternativo
+- `runtime.txt`: Versión específica de Python
+- `requirements.txt`: Dependencias actualizadas con gunicorn
+
 ## Contribuir
 
 1. Fork del repositorio
