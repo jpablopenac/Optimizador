@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Optimizador de Turnos Universitarios</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .form-container {
+            padding: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 30px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1em;
+        }
+
+        .form-group input[type="text"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e1e1;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input[type="text"]:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+        }
+
+        .table-section {
+            margin-bottom: 40px;
+        }
+
+        .table-title {
+            font-size: 1.4em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .schedule-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 10px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .schedule-table td {
+            padding: 15px 10px;
+            text-align: center;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .schedule-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .schedule-table tr:hover {
+            background-color: #e8f4fd;
+        }
+
+        .time-cell {
+            font-weight: 600;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border-radius: 5px;
+        }
+
+        .radio-group {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .radio-group input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #4facfe;
+        }
+
+        .checkbox-section {
+            background: #f8f9ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+
+        .checkbox-row {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 15px;
+            background: white;
+            border-radius: 25px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .checkbox-group:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #4facfe;
+        }
+
+        .checkbox-group label {
+            margin: 0;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .day-header {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .volunteer-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .volunteer-section label {
+            font-size: 1.2em;
+            font-weight: 500;
+        }
+
+        .volunteer-section input[type="checkbox"] {
+            width: 25px;
+            height: 25px;
+            margin-left: 15px;
+            cursor: pointer;
+            accent-color: #4facfe;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 18px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(79, 172, 254, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .validation-message {
+            color: #e74c3c;
+            font-size: 0.9em;
+            margin-top: 5px;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+            
+            .form-container {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .schedule-table {
+                font-size: 0.9em;
+            }
+            
+            .checkbox-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .checkbox-group {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Optimizador de Turnos Universitarios</h1>
+            <p>Ingresa tus preferencias de horarios y disponibilidad</p>
+        </div>
+
+        <div class="form-container">
+            <form action="/submit" method="POST" id="scheduleForm">
+                <!-- Nombre -->
+                <div class="form-group">
+                    <label for="nombre">Nombre de la persona *</label>
+                    <input type="text" id="nombre" name="nombre" required>
+                    <div class="validation-message" id="nombre-error">El nombre es requerido</div>
+                </div>
+
+                <!-- Tabla de Ida -->
+                <div class="table-section">
+                    <div class="table-title">🚌 Preferencias de Viaje de Ida</div>
+                    <table class="schedule-table">
+                        <thead>
+                            <tr>
+                                <th>Hora</th>
+                                <th>Lunes</th>
+                                <th>Martes</th>
+                                <th>Miércoles</th>
+                                <th>Jueves</th>
+                                <th>Viernes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="time-cell">8:20</td>
+                                <td><input type="radio" name="lunes_ida" value="8:20"></td>
+                                <td><input type="radio" name="martes_ida" value="8:20"></td>
+                                <td><input type="radio" name="miercoles_ida" value="8:20"></td>
+                                <td><input type="radio" name="jueves_ida" value="8:20"></td>
+                                <td><input type="radio" name="viernes_ida" value="8:20"></td>
+                            </tr>
+                            <tr>
+                                <td class="time-cell">9:40</td>
+                                <td><input type="radio" name="lunes_ida" value="9:40"></td>
+                                <td><input type="radio" name="martes_ida" value="9:40"></td>
+                                <td><input type="radio" name="miercoles_ida" value="9:40"></td>
+                                <td><input type="radio" name="jueves_ida" value="9:40"></td>
+                                <td><input type="radio" name="viernes_ida" value="9:40"></td>
+                            </tr>
+                            <tr>
+                                <td class="time-cell">11:00</td>
+                                <td><input type="radio" name="lunes_ida" value="11:00"></td>
+                                <td><input type="radio" name="martes_ida" value="11:00"></td>
+                                <td><input type="radio" name="miercoles_ida" value="11:00"></td>
+                                <td><input type="radio" name="jueves_ida" value="11:00"></td>
+                                <td><input type="radio" name="viernes_ida" value="11:00"></td>
+                            </tr>
+                            <tr>
+                                <td class="time-cell">12:20</td>
+                                <td><input type="radio" name="lunes_ida" value="12:20"></td>
+                                <td><input type="radio" name="martes_ida" value="12:20"></td>
+                                <td><input type="radio" name="miercoles_ida" value="12:20"></td>
+                                <td><input type="radio" name="jueves_ida" value="12:20"></td>
+                                <td><input type="radio" name="viernes_ida" value="12:20"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Tabla de Vuelta -->
+                <div class="table-section">
+                    <div class="table-title">🏠 Preferencias de Viaje de Vuelta</div>
+                    <table class="schedule-table">
+                        <thead>
+                            <tr>
+                                <th>Hora</th>
+                                <th>Lunes</th>
+                                <th>Martes</th>
+                                <th>Miércoles</th>
+                                <th>Jueves</th>
+                                <th>Viernes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="time-cell">13:30</td>
+                                <td><input type="radio" name="lunes_vuelta" value="13:30"></td>
+                                <td><input type="radio" name="martes_vuelta" value="13:30"></td>
+                                <td><input type="radio" name="miercoles_vuelta" value="13:30"></td>
+                                <td><input type="radio" name="jueves_vuelta" value="13:30"></td>
+                                <td><input type="radio" name="viernes_vuelta" value="13:30"></td>
+                            </tr>
+                            <tr>
+                                <td class="time-cell">16:00</td>
+                                <td><input type="radio" name="lunes_vuelta" value="16:00"></td>
+                                <td><input type="radio" name="martes_vuelta" value="16:00"></td>
+                                <td><input type="radio" name="miercoles_vuelta" value="16:00"></td>
+                                <td><input type="radio" name="jueves_vuelta" value="16:00"></td>
+                                <td><input type="radio" name="viernes_vuelta" value="16:00"></td>
+                            </tr>
+                            <tr>
+                                <td class="time-cell">17:20</td>
+                                <td><input type="radio" name="lunes_vuelta" value="17:20"></td>
+                                <td><input type="radio" name="martes_vuelta" value="17:20"></td>
+                                <td><input type="radio" name="miercoles_vuelta" value="17:20"></td>
+                                <td><input type="radio" name="jueves_vuelta" value="17:20"></td>
+                                <td><input type="radio" name="viernes_vuelta" value="17:20"></td>
+                            </tr>
+                            <tr>
+                                <td class="time-cell">18:40</td>
+                                <td><input type="radio" name="lunes_vuelta" value="18:40"></td>
+                                <td><input type="radio" name="martes_vuelta" value="18:40"></td>
+                                <td><input type="radio" name="miercoles_vuelta" value="18:40"></td>
+                                <td><input type="radio" name="jueves_vuelta" value="18:40"></td>
+                                <td><input type="radio" name="viernes_vuelta" value="18:40"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Sección de Flexibilidad y Conductor -->
+                <div class="checkbox-section">
+                    <h3 style="text-align: center; margin-bottom: 20px; color: #667eea;">⚙️ Opciones de Flexibilidad y Conductor</h3>
+                    
+                    <!-- Lunes -->
+                    <div class="day-header">Lunes</div>
+                    <div class="checkbox-row">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="lunes_flex_ida" name="lunes_flex_ida">
+                            <label for="lunes_flex_ida">Permite ida flexible</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="lunes_flex_vuelta" name="lunes_flex_vuelta">
+                            <label for="lunes_flex_vuelta">Permite vuelta flexible</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="lunes_conductor" name="lunes_conductor">
+                            <label for="lunes_conductor">Dispuesto a manejar</label>
+                        </div>
+                    </div>
+
+                    <!-- Martes -->
+                    <div class="day-header">Martes</div>
+                    <div class="checkbox-row">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="martes_flex_ida" name="martes_flex_ida">
+                            <label for="martes_flex_ida">Permite ida flexible</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="martes_flex_vuelta" name="martes_flex_vuelta">
+                            <label for="martes_flex_vuelta">Permite vuelta flexible</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="martes_conductor" name="martes_conductor">
+                            <label for="martes_conductor">Dispuesto a manejar</label>
+                        </div>
+                    </div>
+
+                    <!-- Miércoles -->
+                    <div class="day-header">Miércoles</div>
+                    <div class="checkbox-row">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="miercoles_flex_ida" name="miercoles_flex_ida">
+                            <label for="miercoles_flex_ida">Permite ida flexible</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="miercoles_flex_vuelta" name="miercoles_flex_vuelta">
+                            <label for="miercoles_flex_vuelta">Permite vuelta flexible</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="miercoles_conductor" name="miercoles_conductor">
+                            <label for="miercoles_conductor">Dispuesto a manejar</label>
+                        </div>
+                    </div>
+
+                    <!-- Jueves -->
+                    <div class="day-header">Jueves</div>
+                    <div class="checkbox-row">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="jueves_flex_ida" name="jueves_flex_ida">
+                            <label for="jueves_flex_ida">Permite ida flexible</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="jueves_flex_vuelta" name="jueves_flex_vuelta">
+                            <label for="jueves_flex_vuelta">Permite vuelta flexible</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="jueves_conductor" name="jueves_conductor">
+                            <label for="jueves_conductor">Dispuesto a manejar</label>
+                        </div>
+                    </div>
+
+                    <!-- Viernes -->
+                    <div class="day-header">Viernes</div>
+                    <div class="checkbox-row">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="viernes_flex_ida" name="viernes_flex_ida">
+                            <label for="viernes_flex_ida">Permite ida flexible</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="viernes_flex_vuelta" name="viernes_flex_vuelta">
+                            <label for="viernes_flex_vuelta">Permite vuelta flexible</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="viernes_conductor" name="viernes_conductor">
+                            <label for="viernes_conductor">Dispuesto a manejar</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Voluntario segundo viaje -->
+                <div class="volunteer-section">
+                    <label for="voluntario_segundo_viaje">
+                        🚗 Dispuesto a realizar un segundo viaje voluntario
+                        <input type="checkbox" id="voluntario_segundo_viaje" name="voluntario_segundo_viaje">
+                    </label>
+                </div>
+
+                <!-- Botón de envío -->
+                <button type="submit" class="submit-btn">Enviar Preferencias</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('scheduleForm').addEventListener('submit', function(e) {
+            const nombre = document.getElementById('nombre').value.trim();
+            if (!nombre) {
+                e.preventDefault();
+                document.getElementById('nombre-error').style.display = 'block';
+                document.getElementById('nombre').focus();
+                return;
+            }
+
+            // Validar que si marca conductor, tenga ida y vuelta
+            const dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
+            let validationPassed = true;
+
+            dias.forEach(dia => {
+                const conductorCheckbox = document.querySelector(`input[name="${dia}_conductor"]`);
+                if (conductorCheckbox && conductorCheckbox.checked) {
+                    const idaRadio = document.querySelector(`input[name="${dia}_ida"]:checked`);
+                    const vueltaRadio = document.querySelector(`input[name="${dia}_vuelta"]:checked`);
+                    
+                    if (!idaRadio || !vueltaRadio) {
+                        e.preventDefault();
+                        alert(`Error: Si estás dispuesto a manejar el ${dia.charAt(0).toUpperCase() + dia.slice(1)}, debes seleccionar una hora de ida y vuelta para ese día.`);
+                        validationPassed = false;
+                    }
+                }
+            });
+
+            if (validationPassed) {
+                // Mostrar mensaje de carga
+                const submitBtn = document.querySelector('.submit-btn');
+                submitBtn.innerHTML = 'Enviando... ⏳';
+                submitBtn.disabled = true;
+            }
+        });
+
+        // Ocultar mensajes de error cuando el usuario empiece a escribir
+        document.getElementById('nombre').addEventListener('input', function() {
+            document.getElementById('nombre-error').style.display = 'none';
+        });
+    </script>
+</body>
+</html>

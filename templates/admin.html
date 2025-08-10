@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - Optimizador</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 30px;
+            background: #f8f9ff;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: 600;
+            color: #4facfe;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1.1em;
+            color: #666;
+        }
+
+        .actions {
+            padding: 30px;
+            text-align: center;
+            background: white;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .action-btn {
+            display: inline-block;
+            margin: 10px;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: transform 0.3s, box-shadow 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(79, 172, 254, 0.4);
+        }
+
+        .action-btn.secondary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .data-table {
+            margin: 30px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .table-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            font-size: 1.3em;
+            font-weight: 600;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        th {
+            background: #f8f9ff;
+            font-weight: 600;
+            color: #333;
+        }
+
+        tr:hover {
+            background: #f8f9ff;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #4facfe;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4facfe;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .stats {
+                grid-template-columns: 1fr;
+                padding: 20px;
+            }
+            
+            .data-table {
+                margin: 20px 10px;
+            }
+            
+            table {
+                font-size: 0.9em;
+            }
+            
+            .action-btn {
+                display: block;
+                margin: 10px auto;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Panel de Administración</h1>
+            <p>Recopilación de datos de turnos universitarios</p>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number">{{ total_usuarios }}</div>
+                <div class="stat-label">Usuarios Registrados</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="total-viajes">-</div>
+                <div class="stat-label">Total Viajes Solicitados</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="conductores-disponibles">-</div>
+                <div class="stat-label">Conductores Disponibles</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="voluntarios">-</div>
+                <div class="stat-label">Voluntarios Segundo Viaje</div>
+            </div>
+        </div>
+
+        <div class="actions">
+            <a href="/download-csv" class="action-btn">📥 Descargar CSV</a>
+            <a href="/" class="action-btn secondary">🔙 Volver al Formulario</a>
+        </div>
+
+        {% if datos %}
+        <div class="data-table">
+            <div class="table-header">
+                📋 Datos de Usuarios Registrados
+            </div>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Fecha Registro</th>
+                            <th>Lunes</th>
+                            <th>Martes</th>
+                            <th>Miércoles</th>
+                            <th>Jueves</th>
+                            <th>Viernes</th>
+                            <th>Voluntario</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for usuario in datos %}
+                        <tr>
+                            <td><strong>{{ usuario.Nombre }}</strong></td>
+                            <td>{{ usuario.Timestamp }}</td>
+                            <td>
+                                {% if usuario.Lunes_Ida or usuario.Lunes_Vuelta %}
+                                    I:{{ usuario.Lunes_Ida or '-' }} / V:{{ usuario.Lunes_Vuelta or '-' }}
+                                    {% if usuario.Lunes_Conductor == 'Si' %} 🚗{% endif %}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if usuario.Martes_Ida or usuario.Martes_Vuelta %}
+                                    I:{{ usuario.Martes_Ida or '-' }} / V:{{ usuario.Martes_Vuelta or '-' }}
+                                    {% if usuario.Martes_Conductor == 'Si' %} 🚗{% endif %}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if usuario.Miercoles_Ida or usuario.Miercoles_Vuelta %}
+                                    I:{{ usuario.Miercoles_Ida or '-' }} / V:{{ usuario.Miercoles_Vuelta or '-' }}
+                                    {% if usuario.Miercoles_Conductor == 'Si' %} 🚗{% endif %}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if usuario.Jueves_Ida or usuario.Jueves_Vuelta %}
+                                    I:{{ usuario.Jueves_Ida or '-' }} / V:{{ usuario.Jueves_Vuelta or '-' }}
+                                    {% if usuario.Jueves_Conductor == 'Si' %} 🚗{% endif %}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if usuario.Viernes_Ida or usuario.Viernes_Vuelta %}
+                                    I:{{ usuario.Viernes_Ida or '-' }} / V:{{ usuario.Viernes_Vuelta or '-' }}
+                                    {% if usuario.Viernes_Conductor == 'Si' %} 🚗{% endif %}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if usuario.Voluntario_Segundo_Viaje == 'Si' %}
+                                    ✅ Sí
+                                {% else %}
+                                    ❌ No
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% else %}
+        <div class="data-table">
+            <div class="table-header">
+                📋 Datos de Usuarios
+            </div>
+            <div class="no-data">
+                No hay datos de usuarios registrados aún.
+                <br><br>
+                <a href="/" class="action-btn">➕ Agregar Primer Usuario</a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        // Calcular estadísticas adicionales
+        document.addEventListener('DOMContentLoaded', function() {
+            {% if datos %}
+            let totalViajes = 0;
+            let conductoresDisponibles = 0;
+            let voluntarios = 0;
+            
+            const datos = {{ datos | tojson }};
+            
+            datos.forEach(usuario => {
+                // Contar viajes
+                const dias = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes'];
+                dias.forEach(dia => {
+                    if (usuario[dia + '_Ida']) totalViajes++;
+                    if (usuario[dia + '_Vuelta']) totalViajes++;
+                });
+                
+                // Contar conductores disponibles (al menos un día)
+                let esConductor = false;
+                dias.forEach(dia => {
+                    if (usuario[dia + '_Conductor'] === 'Si') {
+                        esConductor = true;
+                    }
+                });
+                if (esConductor) conductoresDisponibles++;
+                
+                // Contar voluntarios
+                if (usuario['Voluntario_Segundo_Viaje'] === 'Si') {
+                    voluntarios++;
+                }
+            });
+            
+            document.getElementById('total-viajes').textContent = totalViajes;
+            document.getElementById('conductores-disponibles').textContent = conductoresDisponibles;
+            document.getElementById('voluntarios').textContent = voluntarios;
+            {% endif %}
+        });
+    </script>
+</body>
+</html>

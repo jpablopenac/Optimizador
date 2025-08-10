@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados de Optimización</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .results-section {
+            padding: 30px;
+        }
+
+        .model-results {
+            margin-bottom: 40px;
+            background: #f8f9ff;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .model-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            font-size: 1.4em;
+            font-weight: 600;
+        }
+
+        .heatmap-container {
+            padding: 30px;
+        }
+
+        .heatmap-title {
+            text-align: center;
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .heatmap-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .heatmap-table th {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 15px 10px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .heatmap-table td {
+            padding: 15px;
+            text-align: center;
+            border: 1px solid #e0e0e0;
+            position: relative;
+            min-width: 60px;
+        }
+
+        .time-cell {
+            font-weight: 600;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .heat-cell {
+            font-weight: bold;
+            color: white;
+            position: relative;
+        }
+
+        .conductores-section {
+            padding: 30px;
+        }
+
+        .day-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .day-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .day-header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.4em;
+            font-weight: 600;
+        }
+
+        .schedule-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 25px;
+        }
+
+        .schedule-type {
+            background: #f8f9ff;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .schedule-type h4 {
+            color: #667eea;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .time-slot {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid #4facfe;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .time-slot-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .time-label {
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1em;
+        }
+
+        .capacity-info {
+            background: #e8f4fd;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            color: #0066cc;
+        }
+
+        .conductores-list {
+            margin-top: 10px;
+        }
+
+        .conductor-item {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            display: inline-block;
+            margin: 3px;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        .no-conductores {
+            color: #999;
+            font-style: italic;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .deficit {
+            background: #fee;
+            border-left-color: #ff6b6b;
+        }
+
+        .deficit .capacity-info {
+            background: #ffebee;
+            color: #d32f2f;
+        }
+
+        .actions {
+            padding: 30px;
+            text-align: center;
+            background: #f8f9ff;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .action-btn {
+            display: inline-block;
+            margin: 10px;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(79, 172, 254, 0.4);
+        }
+
+        .action-btn.secondary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .schedule-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .heatmap-table {
+                font-size: 0.9em;
+            }
+            
+            .action-btn {
+                display: block;
+                margin: 10px auto;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Resultados de Optimización</h1>
+            <p>Análisis de densidad y asignación de conductores</p>
+        </div>
+
+        <div class="results-section">
+            <!-- Resultados del Modelo 1: Densidad -->
+            <div class="model-results">
+                <div class="model-header">
+                    📊 Modelo 1: Análisis de Densidad de Demanda
+                </div>
+                <div class="heatmap-container">
+                    {% if densidad.heatmap_data %}
+                    <!-- Heatmap de Ida -->
+                    <div class="heatmap-title">🚌 Distribución Optimizada - Viajes de Ida</div>
+                    <table class="heatmap-table">
+                        <thead>
+                            <tr>
+                                <th>Hora</th>
+                                {% for dia in densidad.heatmap_data.ida.dias %}
+                                <th>{{ dia }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in range(densidad.heatmap_data.ida.horas|length) %}
+                            <tr>
+                                <td class="time-cell">{{ densidad.heatmap_data.ida.horas[i] }}</td>
+                                {% for j in range(densidad.heatmap_data.ida.dias|length) %}
+                                <td class="heat-cell" style="background-color: hsl({{ (240 - densidad.heatmap_data.ida.matrix[i][j] * 40)|int }}, 70%, {{ (90 - densidad.heatmap_data.ida.matrix[i][j] * 15)|int }}%)">
+                                    {{ densidad.heatmap_data.ida.matrix[i][j] }}
+                                </td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <!-- Heatmap de Vuelta -->
+                    <div class="heatmap-title">🏠 Distribución Optimizada - Viajes de Vuelta</div>
+                    <table class="heatmap-table">
+                        <thead>
+                            <tr>
+                                <th>Hora</th>
+                                {% for dia in densidad.heatmap_data.vuelta.dias %}
+                                <th>{{ dia }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in range(densidad.heatmap_data.vuelta.horas|length) %}
+                            <tr>
+                                <td class="time-cell">{{ densidad.heatmap_data.vuelta.horas[i] }}</td>
+                                {% for j in range(densidad.heatmap_data.vuelta.dias|length) %}
+                                <td class="heat-cell" style="background-color: hsl({{ (240 - densidad.heatmap_data.vuelta.matrix[i][j] * 40)|int }}, 70%, {{ (90 - densidad.heatmap_data.vuelta.matrix[i][j] * 15)|int }}%)">
+                                    {{ densidad.heatmap_data.vuelta.matrix[i][j] }}
+                                </td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <p style="text-align: center; color: #666; padding: 20px;">
+                        No se pudieron generar los heatmaps de densidad.
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Resultados del Modelo 2: Conductores -->
+            <div class="model-results">
+                <div class="model-header">
+                    🚗 Modelo 2: Asignación Óptima de Conductores
+                </div>
+                <div class="conductores-section">
+                    {% if conductores.grid_resultados %}
+                    <div class="day-grid">
+                        {% for dia, horarios in conductores.grid_resultados.items() %}
+                        <div class="day-card">
+                            <div class="day-header">
+                                {{ dia.capitalize() }}
+                            </div>
+                            <div class="schedule-grid">
+                                <!-- Ida -->
+                                <div class="schedule-type">
+                                    <h4>🚌 Viajes de Ida</h4>
+                                    {% for hora, data in horarios.ida.items() %}
+                                    <div class="time-slot {% if data.deficit > 0 %}deficit{% endif %}">
+                                        <div class="time-slot-header">
+                                            <span class="time-label">{{ hora }}</span>
+                                            <span class="capacity-info">
+                                                {{ data.demanda }} pasajeros / {{ data.capacidad_total }} capacidad
+                                                {% if data.deficit > 0 %}
+                                                    (⚠️ -{{ data.deficit }})
+                                                {% endif %}
+                                            </span>
+                                        </div>
+                                        <div class="conductores-list">
+                                            {% if data.conductores %}
+                                                {% for conductor in data.conductores %}
+                                                <span class="conductor-item">
+                                                    {{ conductor.nombre }} ({{ conductor.capacidad }} plazas)
+                                                </span>
+                                                {% endfor %}
+                                            {% else %}
+                                                <div class="no-conductores">Sin conductores asignados</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+
+                                <!-- Vuelta -->
+                                <div class="schedule-type">
+                                    <h4>🏠 Viajes de Vuelta</h4>
+                                    {% for hora, data in horarios.vuelta.items() %}
+                                    <div class="time-slot {% if data.deficit > 0 %}deficit{% endif %}">
+                                        <div class="time-slot-header">
+                                            <span class="time-label">{{ hora }}</span>
+                                            <span class="capacity-info">
+                                                {{ data.demanda }} pasajeros / {{ data.capacidad_total }} capacidad
+                                                {% if data.deficit > 0 %}
+                                                    (⚠️ -{{ data.deficit }})
+                                                {% endif %}
+                                            </span>
+                                        </div>
+                                        <div class="conductores-list">
+                                            {% if data.conductores %}
+                                                {% for conductor in data.conductores %}
+                                                <span class="conductor-item">
+                                                    {{ conductor.nombre }} ({{ conductor.capacidad }} plazas)
+                                                </span>
+                                                {% endfor %}
+                                            {% else %}
+                                                <div class="no-conductores">Sin conductores asignados</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p style="text-align: center; color: #666; padding: 20px;">
+                        No se pudieron generar los resultados de asignación de conductores.
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="actions">
+            <a href="/admin" class="action-btn">📊 Volver al Panel</a>
+            <a href="/" class="action-btn secondary">🔙 Nuevo Usuario</a>
+            <a href="/download-csv" class="action-btn secondary">📥 Descargar Datos</a>
+        </div>
+    </div>
+</body>
+</html>
