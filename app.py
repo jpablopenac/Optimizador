@@ -1,7 +1,8 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, jsonify
 import csv
 import os
 from datetime import datetime
+from optimizador import ejecutar_optimizacion, CAPACIDAD_VEHICULO
 
 app = Flask(__name__)
 
@@ -139,6 +140,92 @@ def download_csv():
         return send_file(DATA_FILE, as_attachment=True, download_name=f'datos_usuarios_{datetime.now().strftime("%Y%m%d_%H%M")}.csv')
     except Exception as e:
         return f"Error al descargar archivo: {str(e)}", 500
+
+
+# =============================================================================
+# RUTAS DE OPTIMIZACIÓN
+# =============================================================================
+
+@app.route('/optimizar')
+def optimizar():
+    """Ejecuta la optimización y muestra los resultados"""
+    try:
+        # Verificar que existen datos
+        if not os.path.exists(DATA_FILE):
+            return render_template('resultados.html', 
+                                   error="No hay datos para optimizar. Primero registra algunos usuarios.",
+                                   exito=False)
+        
+        # Obtener capacidad personalizada si se proporciona
+        capacidad = request.args.get('capacidad', CAPACIDAD_VEHICULO, type=int)
+        
+        # Ejecutar optimización
+        resultado = ejecutar_optimizacion(DATA_FILE, capacidad)
+        
+        if not resultado.get('exito'):
+            return render_template('resultados.html', 
+                                   error=resultado.get('error', 'Error desconocido'),
+                                   exito=False)
+        
+        return render_template('resultados.html',
+                               exito=True,
+                               total_usuarios=resultado['total_usuarios'],
+                               densidad=resultado['densidad'],
+                               conductores=resultado['conductores'],
+                               capacidad=capacidad)
+    
+    except Exception as e:
+        return render_template('resultados.html', 
+                               error=f"Error al ejecutar optimización: {str(e)}",
+                               exito=False)
+
+
+@app.route('/api/optimizar')
+def api_optimizar():
+    """API JSON para obtener resultados de optimización"""
+    try:
+        if not os.path.exists(DATA_FILE):
+            return jsonify({'exito': False, 'error': 'No hay datos para optimizar'}), 404
+        
+        capacidad = request.args.get('capacidad', CAPACIDAD_VEHICULO, type=int)
+        resultado = ejecutar_optimizacion(DATA_FILE, capacidad)
+        
+        return jsonify(resultado)
+    
+    except Exception as e:
+        return jsonify({'exito': False, 'error': str(e)}), 500
+
+
+@app.route('/api/estadisticas')
+def api_estadisticas():
+    """API para obtener estadísticas rápidas sin optimización completa"""
+    try:
+        if not os.path.exists(DATA_FILE):
+            return jsonify({'exito': False, 'error': 'No hay datos'}), 404
+        
+        import pandas as pd
+        datos = pd.read_csv(DATA_FILE, encoding='utf-8')
+        
+        if datos.empty:
+            return jsonify({'exito': False, 'error': 'No hay registros'}), 404
+        
+        # Estadísticas básicas
+        total_usuarios = len(datos)
+        conductores_totales = sum(
+            (datos[f'{dia}_Conductor'] == 'Si').sum()
+            for dia in ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes']
+        )
+        
+        return jsonify({
+            'exito': True,
+            'total_usuarios': total_usuarios,
+            'conductores_totales': int(conductores_totales),
+            'ultima_actualizacion': datos['Timestamp'].max() if 'Timestamp' in datos.columns else None
+        })
+    
+    except Exception as e:
+        return jsonify({'exito': False, 'error': str(e)}), 500
+
 
 if __name__ == '__main__':
     inicializar_csv()
