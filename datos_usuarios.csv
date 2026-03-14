@@ -1,21 +1,13 @@
 Nombre,Timestamp,Lunes_Ida,Lunes_Vuelta,Lunes_Conductor,Lunes_Flex_Ida,Lunes_Flex_Vuelta,Martes_Ida,Martes_Vuelta,Martes_Conductor,Martes_Flex_Ida,Martes_Flex_Vuelta,Miercoles_Ida,Miercoles_Vuelta,Miercoles_Conductor,Miercoles_Flex_Ida,Miercoles_Flex_Vuelta,Jueves_Ida,Jueves_Vuelta,Jueves_Conductor,Jueves_Flex_Ida,Jueves_Flex_Vuelta,Viernes_Ida,Viernes_Vuelta,Viernes_Conductor,Viernes_Flex_Ida,Viernes_Flex_Vuelta,Voluntario_Segundo_Viaje
-Carlos García,2026-02-28 08:00:00,8:20,16:00,Si,No,No,8:20,16:00,Si,No,No,8:20,16:00,Si,No,No,8:20,16:00,Si,No,No,8:20,16:00,Si,No,No,Si
-María López,2026-02-28 08:05:00,9:40,17:20,Si,Si,Si,9:40,17:20,No,Si,Si,9:40,17:20,No,Si,Si,9:40,17:20,No,Si,Si,9:40,17:20,No,Si,Si,No
-Juan Pérez,2026-02-28 08:10:00,9:40,16:00,Si,No,No,9:40,16:00,Si,No,No,9:40,16:00,No,No,No,9:40,16:00,No,No,No,9:40,16:00,No,No,No,No
-Ana Martínez,2026-02-28 08:15:00,11:00,17:20,No,Si,No,11:00,17:20,Si,Si,No,11:00,17:20,No,Si,No,11:00,17:20,No,Si,No,11:00,17:20,No,Si,No,No
-Pedro Sánchez,2026-02-28 08:20:00,9:40,17:20,No,Si,Si,9:40,17:20,No,Si,Si,9:40,17:20,Si,Si,Si,9:40,17:20,No,Si,Si,9:40,17:20,No,Si,Si,No
-Laura Rodríguez,2026-02-28 08:25:00,11:00,18:40,Si,No,No,11:00,18:40,Si,No,No,11:00,18:40,Si,No,No,11:00,18:40,Si,No,No,11:00,18:40,Si,No,No,Si
-Diego Hernández,2026-02-28 08:30:00,8:20,13:30,Si,No,Si,8:20,13:30,No,No,Si,8:20,13:30,No,No,Si,8:20,13:30,No,No,Si,8:20,13:30,No,No,Si,No
-Sofía Torres,2026-02-28 08:35:00,9:40,16:00,No,Si,Si,9:40,16:00,No,Si,Si,9:40,16:00,No,Si,Si,9:40,16:00,Si,Si,Si,9:40,16:00,No,Si,Si,No
-Roberto Díaz,2026-02-28 08:40:00,11:00,17:20,Si,No,No,11:00,17:20,No,No,No,11:00,17:20,No,No,No,11:00,17:20,No,No,No,11:00,17:20,No,No,No,No
-Carmen Ruiz,2026-02-28 08:45:00,12:20,18:40,No,Si,No,12:20,18:40,No,Si,No,12:20,18:40,No,Si,No,12:20,18:40,No,Si,No,12:20,18:40,Si,Si,No,No
-Miguel Flores,2026-02-28 08:50:00,8:20,16:00,No,No,Si,8:20,16:00,No,No,Si,8:20,16:00,Si,No,Si,8:20,16:00,No,No,Si,8:20,16:00,No,No,Si,No
-Patricia Vargas,2026-02-28 08:55:00,9:40,17:20,No,Si,No,9:40,17:20,No,Si,No,9:40,17:20,No,Si,No,9:40,17:20,No,Si,No,9:40,17:20,Si,Si,No,No
-Fernando Castro,2026-02-28 09:00:00,11:00,16:00,Si,No,Si,11:00,16:00,No,No,Si,11:00,16:00,No,No,Si,11:00,16:00,No,No,Si,11:00,16:00,No,No,Si,No
-Lucía Morales,2026-02-28 09:05:00,9:40,18:40,No,Si,No,9:40,18:40,Si,Si,No,9:40,18:40,No,Si,No,9:40,18:40,No,Si,No,9:40,18:40,No,Si,No,No
-Andrés Jiménez,2026-02-28 09:10:00,8:20,17:20,No,No,Si,8:20,17:20,No,No,Si,8:20,17:20,No,No,Si,8:20,17:20,No,No,Si,8:20,17:20,Si,No,Si,No
-Elena Navarro,2026-02-28 09:15:00,12:20,18:40,No,Si,No,12:20,18:40,No,Si,No,12:20,18:40,Si,Si,No,12:20,18:40,No,Si,No,12:20,18:40,No,Si,No,No
-Javier Romero,2026-02-28 09:20:00,11:00,17:20,No,Si,Si,11:00,17:20,No,Si,Si,11:00,17:20,No,Si,Si,11:00,17:20,Si,Si,Si,11:00,17:20,No,Si,Si,No
-Isabel Ortiz,2026-02-28 09:25:00,9:40,16:00,Si,No,No,9:40,16:00,Si,No,No,9:40,16:00,Si,No,No,9:40,16:00,Si,No,No,9:40,16:00,Si,No,No,Si
-Raúl Delgado,2026-02-28 09:30:00,8:20,13:30,No,No,No,8:20,13:30,No,No,No,8:20,13:30,No,No,No,8:20,13:30,No,No,No,8:20,13:30,No,No,No,No
-Mónica Fuentes,2026-02-28 09:35:00,11:00,17:20,No,Si,Si,11:00,17:20,No,Si,Si,11:00,17:20,No,Si,Si,11:00,17:20,No,Si,Si,11:00,17:20,No,Si,Si,No
+Juan Pablo P,2026-02-28 8:00:00,8:20,13:30,No,No,No,11:00,16:00,Si,No,No,8:20,17:20,Si,No,No,11:00,17:20,Si,No,No,,,No,No,No,No
+Jose M,2026-02-28 8:05:00,8:20,13:30,Si,No,No,9:40,10:50,Si,No,No,9:40,17:20,Si,No,No,9:40,10:50,Si,No,No,,,No,No,No,No
+Lucas P,2026-02-28 8:10:00,8:20,13:30,No,No,No,8:20,13:30,No,No,No,8:20,13:30,No,No,No,8:20,17:20,Si,No,No,,,No,No,No,No
+Vicente G-H,2026-02-28 8:15:00,9:40,13:30,Si,No,No,9:40,16:00,Si,No,No,9:40,13:30,Si,No,No,9:40,16:00,Si,No,No,,,No,No,No,No
+Cristobal A,2026-02-28 8:20:00,9:40,13:30,Si,No,No,8:20,10:50,Si,No,No,9:40,13:30,Si,No,No,8:20,11:00,Si,No,No,,,No,No,No,No
+Eduardo R,2026-02-28 8:25:00,8:20,17:20,Si,No,No,8:20,10:50,Si,No,No,8:20,17:20,Si,No,No,8:20,16:00,Si,No,No,,,No,No,No,Si
+Gaspar B,2026-02-28 8:30:00,8:20,13:30,Si,No,No,8:20,17:20,Si,No,No,8:20,13:30,Si,No,No,8:20,17:20,Si,No,No,,,No,No,No,No
+Juan Diego A,2026-02-28 8:35:00,9:40,13:30,Si,No,No,11:00,16:00,Si,No,No,9:40,13:30,Si,No,No,8:20,16:00,Si,No,No,,,No,No,No,No
+Jacinta L,2026-02-28 8:40:00,,,No,No,No,8:20,10:50,Si,No,No,8:20,13:30,Si,No,No,11:00,,No,No,No,,,No,No,No,No
+Magdalena S,2026-02-28 8:45:00,8:20,17:20,Si,No,No,8:20,17:20,Si,No,No,8:20,17:20,Si,No,No,8:20,17:20,Si,No,No,,,No,No,No,No
+Catalina T,2026-02-28 8:50:00,8:20,13:30,No,No,No,8:20,13:30,No,No,No,8:20,13:30,No,No,No,8:20,16:00,Si,No,No,,,No,No,No,No
+Juan Pablo F,2026-02-28 8:55:00,8:20,13:30,Si,No,No,8:20,17:20,Si,No,No,8:20,13:30,Si,No,No,,,No,No,No,,,No,No,No,No

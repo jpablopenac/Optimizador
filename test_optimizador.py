@@ -229,7 +229,7 @@ class TestOptimizadorConductores:
         assert resumen['total_conductores_asignados'] == 3
     
     def test_voluntario_puede_manejar_dos_veces(self, csv_con_voluntario):
-        """Verifica que voluntarios pueden hacer hasta 2 viajes"""
+        """Verifica que voluntarios pueden manejar hasta 2 días"""
         datos = pd.read_csv(StringIO(csv_con_voluntario))
         consolidador = ConsolidadorDemanda(datos)
         bloques_ida, bloques_vuelta = consolidador.ejecutar()
@@ -242,9 +242,35 @@ class TestOptimizadorConductores:
         )
         optimizador.optimizar()
         
-        # Ana es voluntaria, puede manejar 1 o 2 veces
+        # Ana es voluntaria, puede manejar como máximo 2 días
         asignaciones_ana = optimizador.asignaciones_conductor.get('Ana', [])
-        assert len(asignaciones_ana) <= 2
+        dias_asignados_ana = {a['dia'] for a in asignaciones_ana}
+        assert len(dias_asignados_ana) <= 2
+
+    def test_mismo_chofer_en_ida_y_vuelta_por_dia(self, csv_basico):
+        """Si un chofer maneja ida en un día, debe manejar también la vuelta ese día."""
+        datos = pd.read_csv(StringIO(csv_basico))
+        consolidador = ConsolidadorDemanda(datos)
+        bloques_ida, bloques_vuelta = consolidador.ejecutar()
+
+        optimizador = OptimizadorConductores(
+            bloques_ida, bloques_vuelta,
+            consolidador.todos_usuarios,
+            consolidador.disponibilidad_conductor,
+            consolidador.voluntarios_segundo_viaje
+        )
+        optimizador.optimizar()
+
+        for chofer, asignaciones in optimizador.asignaciones_conductor.items():
+            tipos_por_dia = {}
+            for a in asignaciones:
+                dia = a['dia']
+                if dia not in tipos_por_dia:
+                    tipos_por_dia[dia] = set()
+                tipos_por_dia[dia].add(a['tipo'])
+
+            for dia, tipos in tipos_por_dia.items():
+                assert tipos == {'ida', 'vuelta'}, f"{chofer} no cumple ida/vuelta en {dia}: {tipos}"
     
     def test_usuario_sin_disponibilidad_excluido(self, csv_sin_conductor):
         """Verifica que usuarios sin posibilidad de manejar son excluidos"""
@@ -424,9 +450,11 @@ class TestConfiguracion:
         assert '12:20' in HORARIOS_IDA
     
     def test_horarios_vuelta(self):
-        assert len(HORARIOS_VUELTA) == 4
+        assert len(HORARIOS_VUELTA) == 5
+        assert '10:50' in HORARIOS_VUELTA
+        assert '12:20' in HORARIOS_VUELTA
         assert '13:30' in HORARIOS_VUELTA
-        assert '18:40' in HORARIOS_VUELTA
+        assert '17:20' in HORARIOS_VUELTA
     
     def test_capacidad_vehiculo(self):
         # 4 pasajeros + 1 conductor = 5 personas por auto

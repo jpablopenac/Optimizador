@@ -114,109 +114,75 @@
             padding: 30px;
         }
 
-        .day-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 30px;
-            margin-bottom: 30px;
+        .day-title {
+            margin: 25px 0 12px;
+            font-size: 1.25em;
+            color: #445;
+            font-weight: 700;
         }
 
-        .day-card {
+        .asignacion-table {
+            width: 100%;
+            border-collapse: collapse;
             background: white;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
-        .day-header {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            color: white;
-            padding: 20px;
-            text-align: center;
-            font-size: 1.4em;
-            font-weight: 600;
-        }
-
-        .schedule-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            padding: 25px;
-        }
-
-        .schedule-type {
-            background: #f8f9ff;
             border-radius: 10px;
-            padding: 20px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            margin-bottom: 16px;
         }
 
-        .schedule-type h4 {
-            color: #667eea;
-            font-size: 1.2em;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
-        .time-slot {
-            background: white;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-left: 4px solid #4facfe;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        .time-slot-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .time-label {
-            font-weight: 600;
-            color: #333;
-            font-size: 1.1em;
-        }
-
-        .capacity-info {
-            background: #e8f4fd;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 0.9em;
-            color: #0066cc;
-        }
-
-        .conductores-list {
-            margin-top: 10px;
-        }
-
-        .conductor-item {
+        .asignacion-table th {
             background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
             color: white;
-            padding: 8px 12px;
-            border-radius: 20px;
-            display: inline-block;
-            margin: 3px;
-            font-size: 0.9em;
-            font-weight: 500;
+            padding: 12px 10px;
+            text-align: left;
+            font-size: 0.92em;
         }
 
-        .no-conductores {
-            color: #999;
-            font-style: italic;
-            text-align: center;
+        .asignacion-table td {
             padding: 10px;
+            border-bottom: 1px solid #eee;
+            vertical-align: top;
+            font-size: 0.92em;
         }
 
-        .deficit {
-            background: #fee;
-            border-left-color: #ff6b6b;
+        .asignacion-table tr:nth-child(even) {
+            background: #fafcff;
         }
 
-        .deficit .capacity-info {
-            background: #ffebee;
-            color: #d32f2f;
+        .tipo-chip {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.85em;
+            background: #eef5ff;
+            color: #375a9e;
+        }
+
+        .estado-ok {
+            color: #127a2b;
+            font-weight: 600;
+        }
+
+        .estado-alerta {
+            color: #b26a00;
+            font-weight: 600;
+        }
+
+        .estado-critico {
+            color: #c62828;
+            font-weight: 600;
+        }
+
+        .lista-nombres {
+            line-height: 1.5;
+        }
+
+        .hint-text {
+            color: #666;
+            font-size: 0.88em;
+            margin-top: 8px;
         }
 
         .actions {
@@ -255,10 +221,6 @@
             
             .header h1 {
                 font-size: 2em;
-            }
-            
-            .schedule-grid {
-                grid-template-columns: 1fr;
             }
             
             .heatmap-table {
@@ -352,74 +314,48 @@
                 </div>
                 <div class="conductores-section">
                     {% if conductores.grid_resultados %}
-                    <div class="day-grid">
-                        {% for dia, horarios in conductores.grid_resultados.items() %}
-                        <div class="day-card">
-                            <div class="day-header">
-                                {{ dia.capitalize() }}
-                            </div>
-                            <div class="schedule-grid">
-                                <!-- Ida -->
-                                <div class="schedule-type">
-                                    <h4>🚌 Viajes de Ida</h4>
-                                    {% for hora, data in horarios.ida.items() %}
-                                    <div class="time-slot {% if data.deficit > 0 %}deficit{% endif %}">
-                                        <div class="time-slot-header">
-                                            <span class="time-label">{{ hora }}</span>
-                                            <span class="capacity-info">
-                                                {{ data.demanda }} pasajeros / {{ data.capacidad_total }} capacidad
-                                                {% if data.deficit > 0 %}
-                                                    (⚠️ -{{ data.deficit }})
-                                                {% endif %}
-                                            </span>
-                                        </div>
-                                        <div class="conductores-list">
-                                            {% if data.conductores %}
-                                                {% for conductor in data.conductores %}
-                                                <span class="conductor-item">
-                                                    {{ conductor.nombre }} ({{ conductor.capacidad }} plazas)
-                                                </span>
-                                                {% endfor %}
-                                            {% else %}
-                                                <div class="no-conductores">Sin conductores asignados</div>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                    {% endfor %}
-                                </div>
-
-                                <!-- Vuelta -->
-                                <div class="schedule-type">
-                                    <h4>🏠 Viajes de Vuelta</h4>
-                                    {% for hora, data in horarios.vuelta.items() %}
-                                    <div class="time-slot {% if data.deficit > 0 %}deficit{% endif %}">
-                                        <div class="time-slot-header">
-                                            <span class="time-label">{{ hora }}</span>
-                                            <span class="capacity-info">
-                                                {{ data.demanda }} pasajeros / {{ data.capacidad_total }} capacidad
-                                                {% if data.deficit > 0 %}
-                                                    (⚠️ -{{ data.deficit }})
-                                                {% endif %}
-                                            </span>
-                                        </div>
-                                        <div class="conductores-list">
-                                            {% if data.conductores %}
-                                                {% for conductor in data.conductores %}
-                                                <span class="conductor-item">
-                                                    {{ conductor.nombre }} ({{ conductor.capacidad }} plazas)
-                                                </span>
-                                                {% endfor %}
-                                            {% else %}
-                                                <div class="no-conductores">Sin conductores asignados</div>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
+                    {% for dia, horarios in conductores.grid_resultados.items() %}
+                    <div class="day-title">{{ dia }}</div>
+                    <table class="asignacion-table">
+                        <thead>
+                            <tr>
+                                <th>Tipo</th>
+                                <th>Hora</th>
+                                <th>Choferes asignados</th>
+                                <th>Pasajeros del bloque</th>
+                                <th>Resumen de cobertura</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for hora, data in horarios.ida.items() %}
+                            <tr>
+                                <td><span class="tipo-chip">Ida</span></td>
+                                <td>{{ hora }}</td>
+                                <td class="lista-nombres">{{ data.choferes_asignados|join(', ') if data.choferes_asignados else '—' }}</td>
+                                <td class="lista-nombres">{{ data.pasajeros_bloque|join(', ') if data.pasajeros_bloque else '—' }}</td>
+                                <td>
+                                    Demanda: {{ data.demanda }} · Capacidad: {{ data.capacidad }} · Cubiertos: {{ data.cubiertos }} · Déficit: {{ data.deficit }}
+                                </td>
+                                <td class="estado-{{ data.estado }}">{{ data.estado|upper }}</td>
+                            </tr>
+                            {% endfor %}
+                            {% for hora, data in horarios.vuelta.items() %}
+                            <tr>
+                                <td><span class="tipo-chip">Vuelta</span></td>
+                                <td>{{ hora }}</td>
+                                <td class="lista-nombres">{{ data.choferes_asignados|join(', ') if data.choferes_asignados else '—' }}</td>
+                                <td class="lista-nombres">{{ data.pasajeros_bloque|join(', ') if data.pasajeros_bloque else '—' }}</td>
+                                <td>
+                                    Demanda: {{ data.demanda }} · Capacidad: {{ data.capacidad }} · Cubiertos: {{ data.cubiertos }} · Déficit: {{ data.deficit }}
+                                </td>
+                                <td class="estado-{{ data.estado }}">{{ data.estado|upper }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% endfor %}
+                    <div class="hint-text">Choferes asignados y pasajeros del bloque se muestran por día/hora para facilitar lectura de asignaciones.</div>
                     {% else %}
                     <p style="text-align: center; color: #666; padding: 20px;">
                         No se pudieron generar los resultados de asignación de conductores.

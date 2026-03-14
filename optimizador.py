@@ -42,7 +42,7 @@ logger = logging.getLogger(__name__)
 
 DIAS = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes']
 HORARIOS_IDA = ['8:20', '9:40', '11:00', '12:20']
-HORARIOS_VUELTA = ['13:30', '16:00', '17:20', '18:40']
+HORARIOS_VUELTA = ['10:50', '12:20', '13:30', '16:00', '17:20']
 # Capacidad = pasajeros que puede llevar cada conductor (sin contarlo a él)
 # Auto con 5 asientos: 1 conductor + 4 pasajeros = CAPACIDAD_VEHICULO = 4
 CAPACIDAD_VEHICULO = 4
@@ -237,7 +237,7 @@ class ConsolidadorDemanda:
     def _obtener_horario_destino_vuelta(self, horario_actual: str) -> Optional[str]:
         """
         Para VUELTA: Retorna el horario 1 bloque DESPUÉS (más tarde).
-        Ej: 16:00 -> 17:20, 17:20 -> 18:40
+        Ej: 12:20 -> 13:30, 16:00 -> 17:20
         """
         idx = HORARIOS_VUELTA.index(horario_actual)
         if idx < len(HORARIOS_VUELTA) - 1:  # Puede moverse hacia adelante
@@ -483,9 +483,10 @@ class OptimizadorConductores:
     La "forma de pago" es manejar. No puedes ser solo pasajero.
     
     Considera:
-    - TODOS los usuarios deben manejar mínimo 1 vez por semana
-    - Voluntario_Segundo_Viaje: Puede conducir hasta 2 veces en la SEMANA
-    - Usuarios normales: Exactamente 1 vez por semana (mínimo obligatorio)
+    - TODOS los usuarios deben manejar mínimo 1 día por semana
+    - Si un conductor maneja IDA un día, debe manejar también VUELTA ese mismo día (y viceversa)
+    - Voluntario_Segundo_Viaje: Puede conducir hasta 2 días en la SEMANA
+    - Usuarios normales: Máximo 1 día por semana
     - Optimización global de toda la semana
     """
     
@@ -511,7 +512,7 @@ class OptimizadorConductores:
         """
         Ejecuta la optimización global de toda la semana.
         
-        REGLA DE ORO: Todos deben manejar mínimo 1 vez para poder ser pasajeros.
+        REGLA DE ORO: Todos deben manejar mínimo 1 día para poder ser pasajeros.
         
         Returns:
             Lista de resultados de optimización por bloque
@@ -579,36 +580,66 @@ class OptimizadorConductores:
             lowBound=0,
             cat='Integer'
         )
+
+        # Variables auxiliares por día
+        y = LpVariable.dicts(
+            "asignacion_dia",
+            [(u, d) for u in usuarios_validos for d in DIAS],
+            cat='Binary'
+        )
         
         # FUNCIÓN OBJETIVO: Maximizar pasajeros cubiertos
         problema += lpSum([pasajeros[i] for i in range(len(slots))]), "Maximizar_Cobertura"
         
-        # =====================================================================
-        # REGLA DE ORO: TODOS deben manejar mínimo 1 vez a la semana
-        # =====================================================================
-        for u in usuarios_validos:
-            problema += (
-                lpSum([x[(u, i)] for i in range(len(slots))]) >= 1,
-                f"Minimo_Un_Viaje_{u}"
-            )
-        
-        # RESTRICCIÓN 2: Límite MÁXIMO de viajes por usuario
-        for u in usuarios_validos:
-            max_viajes = 2 if u in self.voluntarios else 1
-            problema += (
-                lpSum([x[(u, i)] for i in range(len(slots))]) <= max_viajes,
-                f"Max_Viajes_{u}"
-            )
-        
-        # RESTRICCIÓN 3: Usuario solo puede asignarse donde tiene disponibilidad
+        # RESTRICCIÓN 1: Usuario solo puede asignarse donde tiene disponibilidad
         for u in usuarios_validos:
             disponibles_usuario = set(self.disponibilidad.get(u, []))
             for i, (dia, horario, tipo, bloque) in enumerate(slots):
                 slot_key = (dia, horario, tipo)
                 if slot_key not in disponibles_usuario:
                     problema += x[(u, i)] == 0, f"Disponibilidad_{u}_{i}"
+
+        # RESTRICCIÓN 2: Consistencia ida/vuelta por día (si maneja uno, maneja ambos)
+        for u in usuarios_validos:
+            disponibles_usuario = set(self.disponibilidad.get(u, []))
+            for dia in DIAS:
+                ida_indices = [
+                    i for i, (d, h, t, _) in enumerate(slots)
+                    if d == dia and t == 'ida' and (d, h, t) in disponibles_usuario
+                ]
+                vuelta_indices = [
+                    i for i, (d, h, t, _) in enumerate(slots)
+                    if d == dia and t == 'vuelta' and (d, h, t) in disponibles_usuario
+                ]
+
+                if ida_indices and vuelta_indices:
+                    problema += lpSum([x[(u, i)] for i in ida_indices]) == y[(u, dia)], f"Link_Ida_Dia_{u}_{dia}"
+                    problema += lpSum([x[(u, i)] for i in vuelta_indices]) == y[(u, dia)], f"Link_Vuelta_Dia_{u}_{dia}"
+                elif ida_indices and not vuelta_indices:
+                    problema += lpSum([x[(u, i)] for i in ida_indices]) == 0, f"Sin_Par_Vuelta_{u}_{dia}"
+                    problema += y[(u, dia)] == 0, f"Dia_Cero_Sin_Vuelta_{u}_{dia}"
+                elif vuelta_indices and not ida_indices:
+                    problema += lpSum([x[(u, i)] for i in vuelta_indices]) == 0, f"Sin_Par_Ida_{u}_{dia}"
+                    problema += y[(u, dia)] == 0, f"Dia_Cero_Sin_Ida_{u}_{dia}"
+                else:
+                    problema += y[(u, dia)] == 0, f"Dia_Sin_Disponibilidad_{u}_{dia}"
+
+        # RESTRICCIÓN 3: REGLA DE ORO (mínimo 1 día por semana)
+        for u in usuarios_validos:
+            problema += (
+                lpSum([y[(u, d)] for d in DIAS]) >= 1,
+                f"Minimo_Un_Dia_{u}"
+            )
+
+        # RESTRICCIÓN 4: Límite MÁXIMO de días por usuario
+        for u in usuarios_validos:
+            max_dias = 2 if u in self.voluntarios else 1
+            problema += (
+                lpSum([y[(u, d)] for d in DIAS]) <= max_dias,
+                f"Max_Dias_{u}"
+            )
         
-        # RESTRICCIÓN 4: Pasajeros cubiertos <= capacidad * conductores asignados
+        # RESTRICCIÓN 5: Pasajeros cubiertos <= capacidad * conductores asignados
         # Cada conductor cubre: él mismo + CAPACIDAD pasajeros = (CAPACIDAD + 1) personas
         for i in range(len(slots)):
             problema += (
@@ -616,7 +647,7 @@ class OptimizadorConductores:
                 f"Capacidad_{i}"
             )
         
-        # RESTRICCIÓN 5: Pasajeros cubiertos <= demanda real
+        # RESTRICCIÓN 6: Pasajeros cubiertos <= demanda real
         for i, (_, _, _, bloque) in enumerate(slots):
             problema += pasajeros[i] <= bloque.demanda, f"Demanda_{i}"
         
@@ -628,7 +659,7 @@ class OptimizadorConductores:
         if self.estado_solucion == 'Infeasible':
             # Calcular métricas para explicar por qué es infactible
             total_slots_disponibles = sum(len(self.disponibilidad.get(u, [])) for u in usuarios_validos)
-            logger.warning(f"PROBLEMA INFACTIBLE: {len(usuarios_validos)} usuarios deben manejar >= 1 vez")
+            logger.warning(f"PROBLEMA INFACTIBLE: {len(usuarios_validos)} usuarios deben manejar >= 1 día")
             logger.warning(f"Total slots disponibles en el sistema: {total_slots_disponibles}")
             logger.warning(f"Slots con demanda: {len(slots)}")
             
@@ -703,7 +734,11 @@ class OptimizadorConductores:
         total_deficit = sum(r.deficit for r in self.resultados)
         
         conductores_unicos = set(c for r in self.resultados for c in r.conductores_asignados)
-        conductores_doble_viaje = [c for c in conductores_unicos if len(self.asignaciones_conductor[c]) == 2]
+
+        def _dias_asignados(conductor: str) -> int:
+            return len({a['dia'] for a in self.asignaciones_conductor[conductor]})
+
+        conductores_doble_viaje = [c for c in conductores_unicos if _dias_asignados(c) == 2]
         
         # Por día
         por_dia = defaultdict(lambda: {'demanda': 0, 'cubiertos': 0, 'deficit': 0, 'conductores': set()})
@@ -723,8 +758,8 @@ class OptimizadorConductores:
                 'cobertura_pct': round(datos['cubiertos'] / datos['demanda'] * 100, 1) if datos['demanda'] > 0 else 0
             }
         
-        # Usuarios que manejan exactamente 1 vez (cumplieron el mínimo)
-        usuarios_un_viaje = [c for c in conductores_unicos if len(self.asignaciones_conductor[c]) == 1]
+        # Usuarios que manejan exactamente 1 día (cumplieron el mínimo)
+        usuarios_un_viaje = [c for c in conductores_unicos if _dias_asignados(c) == 1]
         
         return {
             'estado_solucion': self.estado_solucion,
@@ -748,14 +783,26 @@ class OptimizadorConductores:
         grid = {dia: {'ida': {}, 'vuelta': {}} for dia in DIAS}
         
         for r in self.resultados:
+            bloque = self.bloques_ida[r.dia][r.horario] if r.tipo == 'ida' else self.bloques_vuelta[r.dia][r.horario]
+            usuarios_bloque = sorted({u.nombre for u in bloque.usuarios})
+            conductores_set = set(r.conductores_asignados)
+            pasajeros_bloque = [u for u in usuarios_bloque if u not in conductores_set]
+            pasajeros_cubiertos_estimados = max(0, r.pasajeros_cubiertos - len(r.conductores_asignados))
+            pasajeros_sin_cupo_estimados = max(0, len(pasajeros_bloque) - pasajeros_cubiertos_estimados)
+
             grid[r.dia][r.tipo][r.horario] = {
                 'demanda': r.demanda_total,
                 'usuarios_fijos': r.usuarios_fijos,
                 'usuarios_movidos': r.usuarios_movidos,
                 'conductores': r.conductores_asignados,
+                'choferes_asignados': r.conductores_asignados,
+                'usuarios_bloque': usuarios_bloque,
+                'pasajeros_bloque': pasajeros_bloque,
                 'num_conductores': len(r.conductores_asignados),
                 'capacidad': r.capacidad_total,
                 'cubiertos': r.pasajeros_cubiertos,
+                'pasajeros_cubiertos_estimados': pasajeros_cubiertos_estimados,
+                'pasajeros_sin_cupo_estimados': pasajeros_sin_cupo_estimados,
                 'deficit': r.deficit,
                 'estado': 'ok' if r.deficit == 0 else ('alerta' if r.deficit <= 2 else 'critico')
             }
