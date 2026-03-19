@@ -47,6 +47,14 @@ HORARIOS_VUELTA = ['10:50', '12:20', '13:30', '16:00', '17:20']
 # Auto con 5 asientos: 1 conductor + 4 pasajeros = CAPACIDAD_VEHICULO = 4
 CAPACIDAD_VEHICULO = 4
 
+# Excepciones de manejo por compensacion familiar.
+# Formato: {usuario_exento: usuario_que_compensa}
+EXCEPCIONES_COMPENSACION = {
+    'Magdalena S': 'Eduardo R',
+    'Gracia L': 'Pablo L',
+}
+COMPENSADORES_BLOQUEADOS_VOLUNTARIO = set(EXCEPCIONES_COMPENSACION.values())
+
 
 # =============================================================================
 # ESTRUCTURAS DE DATOS
@@ -181,7 +189,10 @@ class ConsolidadorDemanda:
             self.todos_usuarios.add(nombre)
             
             # Verificar si es voluntario para segundo viaje
-            if self._es_booleano_positivo(row.get('Voluntario_Segundo_Viaje', '')):
+            if (
+                self._es_booleano_positivo(row.get('Voluntario_Segundo_Viaje', ''))
+                and nombre not in COMPENSADORES_BLOQUEADOS_VOLUNTARIO
+            ):
                 self.voluntarios_segundo_viaje.add(nombre)
             
             for dia in DIAS:
@@ -507,6 +518,9 @@ class OptimizadorConductores:
         self.asignaciones_conductor: Dict[str, List[Dict]] = defaultdict(list)
         self.usuarios_sin_disponibilidad: List[str] = []  # Usuarios que no pueden manejar ningún día
         self.usuarios_un_solo_dia: List[str] = []  # Usuarios que solo pueden manejar 1 día (DEBEN manejar ese día)
+        self.exentos_compensados: Dict[str, str] = {}  # {exento: compensador}
+        self.exentos_manejo: Set[str] = set()
+        self.compensadores_activos: Dict[str, int] = {}  # {compensador: cantidad_exentos}
         
     def optimizar(self) -> List[ResultadoOptimizacion]:
         """
@@ -548,6 +562,23 @@ class OptimizadorConductores:
         
         # Solo consideramos usuarios que SÍ pueden manejar
         usuarios_validos = [u for u in self.todos_usuarios if u in self.disponibilidad and len(self.disponibilidad[u]) > 0]
+
+        # Excepciones activas: exentos presentes en el sistema, con compensador valido.
+        self.exentos_compensados = {}
+        compensadores_activos = defaultdict(int)
+        for exento, compensador in EXCEPCIONES_COMPENSACION.items():
+            if exento not in self.todos_usuarios:
+                continue
+            if compensador not in usuarios_validos:
+                logger.warning(
+                    f"Excepcion activa para {exento}, pero su compensador {compensador} no tiene disponibilidad valida"
+                )
+                continue
+            self.exentos_compensados[exento] = compensador
+            compensadores_activos[compensador] += 1
+
+        self.exentos_manejo = set(self.exentos_compensados.keys())
+        self.compensadores_activos = dict(compensadores_activos)
         
         if not usuarios_validos or not slots:
             for dia, horario, tipo, bloque in slots:
@@ -625,15 +656,32 @@ class OptimizadorConductores:
                     problema += y[(u, dia)] == 0, f"Dia_Sin_Disponibilidad_{u}_{dia}"
 
         # RESTRICCIÓN 3: REGLA DE ORO (mínimo 1 día por semana)
+        # Exentos compensados: no manejan (0 días), su compensador cubre el aporte.
         for u in usuarios_validos:
+            minimo_dias = 0 if u in self.exentos_manejo else 1
             problema += (
-                lpSum([y[(u, d)] for d in DIAS]) >= 1,
+                lpSum([y[(u, d)] for d in DIAS]) >= minimo_dias,
                 f"Minimo_Un_Dia_{u}"
+            )
+
+            if u in self.exentos_manejo:
+                problema += (
+                    lpSum([y[(u, d)] for d in DIAS]) == 0,
+                    f"Exento_No_Maneja_{u}"
+                )
+
+        # RESTRICCIÓN 3B: Compensadores deben cubrir aporte propio + exentos asociados.
+        for compensador, cantidad_exentos in self.compensadores_activos.items():
+            problema += (
+                lpSum([y[(compensador, d)] for d in DIAS]) >= (1 + cantidad_exentos),
+                f"Compensacion_{compensador}"
             )
 
         # RESTRICCIÓN 4: Límite MÁXIMO de días por usuario
         for u in usuarios_validos:
             max_dias = 2 if u in self.voluntarios else 1
+            if u in self.compensadores_activos:
+                max_dias = max(max_dias, 1 + self.compensadores_activos[u])
             problema += (
                 lpSum([y[(u, d)] for d in DIAS]) <= max_dias,
                 f"Max_Dias_{u}"
@@ -774,6 +822,8 @@ class OptimizadorConductores:
             'detalle_doble_viaje': {c: self.asignaciones_conductor[c] for c in conductores_doble_viaje},
             'usuarios_sin_disponibilidad': self.usuarios_sin_disponibilidad,
             'usuarios_un_solo_dia': self.usuarios_un_solo_dia,
+            'exentos_compensados': self.exentos_compensados,
+            'compensadores_activos': self.compensadores_activos,
             'cobertura_global_pct': round(total_cubiertos / total_demanda * 100, 1) if total_demanda > 0 else 0,
             'por_dia': resumen_dias
         }

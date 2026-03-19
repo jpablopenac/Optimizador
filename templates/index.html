@@ -501,6 +501,9 @@
                         🚗 Dispuesto a realizar un segundo viaje voluntario
                         <input type="checkbox" id="voluntario_segundo_viaje" name="voluntario_segundo_viaje">
                     </label>
+                    <div id="voluntario-bloqueado-msg" style="display:none; margin-top:10px; font-size:0.95em; opacity:0.95;">
+                        Este usuario ya participa como compensador familiar y no puede habilitar viaje voluntario adicional.
+                    </div>
                 </div>
 
                 <!-- Botón de envío -->
@@ -546,9 +549,36 @@
         });
 
         // Ocultar mensajes de error cuando el usuario empiece a escribir
+        const nombresBloqueadosVoluntario = new Set(['Eduardo R', 'Pablo L']);
+
+        function normalizarNombre(nombre) {
+            return (nombre || '').trim().toLowerCase();
+        }
+
+        function actualizarBloqueoVoluntario() {
+            const nombreInput = document.getElementById('nombre');
+            const voluntarioCheckbox = document.getElementById('voluntario_segundo_viaje');
+            const msgBloqueo = document.getElementById('voluntario-bloqueado-msg');
+            const nombreActual = normalizarNombre(nombreInput.value);
+
+            const bloqueado = [...nombresBloqueadosVoluntario]
+                .some(nombre => normalizarNombre(nombre) === nombreActual);
+
+            voluntarioCheckbox.disabled = bloqueado;
+            if (bloqueado) {
+                voluntarioCheckbox.checked = false;
+                msgBloqueo.style.display = 'block';
+            } else {
+                msgBloqueo.style.display = 'none';
+            }
+        }
+
         document.getElementById('nombre').addEventListener('input', function() {
             document.getElementById('nombre-error').style.display = 'none';
+            actualizarBloqueoVoluntario();
         });
+
+        actualizarBloqueoVoluntario();
     </script>
 </body>
 </html>

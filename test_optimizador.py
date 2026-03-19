@@ -70,6 +70,16 @@ Ana,2026-01-01 10:00:00,8:20,16:00,Si,No,No,8:20,16:00,Si,No,No,,,No,No,No,,,No,
 Pedro,2026-01-01 10:01:00,8:20,16:00,Si,No,No,,,No,No,No,,,No,No,No,,,No,No,No,,,No,No,No,No"""
 
 
+@pytest.fixture
+def csv_compensacion_exentos():
+    """CSV con exentos compensados por hermanos"""
+    return """Nombre,Timestamp,Lunes_Ida,Lunes_Vuelta,Lunes_Conductor,Lunes_Flex_Ida,Lunes_Flex_Vuelta,Martes_Ida,Martes_Vuelta,Martes_Conductor,Martes_Flex_Ida,Martes_Flex_Vuelta,Miercoles_Ida,Miercoles_Vuelta,Miercoles_Conductor,Miercoles_Flex_Ida,Miercoles_Flex_Vuelta,Jueves_Ida,Jueves_Vuelta,Jueves_Conductor,Jueves_Flex_Ida,Jueves_Flex_Vuelta,Viernes_Ida,Viernes_Vuelta,Viernes_Conductor,Viernes_Flex_Ida,Viernes_Flex_Vuelta,Voluntario_Segundo_Viaje
+Magdalena S,2026-03-15 10:00:00,8:20,17:20,No,No,No,8:20,17:20,No,No,No,8:20,17:20,No,No,No,8:20,17:20,No,No,No,,,No,No,No,No
+Eduardo R,2026-03-15 10:01:00,8:20,17:20,Si,No,No,8:20,17:20,Si,No,No,8:20,17:20,Si,No,No,8:20,17:20,Si,No,No,,,No,No,No,Si
+Gracia L,2026-03-15 10:02:00,8:20,17:20,No,No,No,8:20,17:20,No,No,No,8:20,,No,No,No,8:20,17:20,No,No,No,,,No,No,No,No
+Pablo L,2026-03-15 10:03:00,8:20,17:20,Si,No,No,8:20,17:20,Si,No,No,8:20,17:20,Si,No,No,8:20,17:20,Si,No,No,,,No,No,No,Si"""
+
+
 def crear_archivo_temporal(contenido_csv):
     """Helper para crear archivo CSV temporal"""
     fd, path = tempfile.mkstemp(suffix='.csv')
@@ -307,6 +317,32 @@ class TestOptimizadorConductores:
                 # Capacidad = conductores * 5 (conductor + 4 pasajeros)
                 expected_capacidad = len(r.conductores_asignados) * (CAPACIDAD_VEHICULO + 1)
                 assert r.capacidad_total == expected_capacidad
+
+    def test_exentos_compensados_y_limite_compensador(self, csv_compensacion_exentos):
+        """Exentos no manejan y compensadores manejan exactamente 2 días."""
+        datos = pd.read_csv(StringIO(csv_compensacion_exentos))
+        consolidador = ConsolidadorDemanda(datos)
+        bloques_ida, bloques_vuelta = consolidador.ejecutar()
+
+        # Aunque en CSV estén en Si, estos nombres deben quedar bloqueados como voluntarios.
+        assert 'Eduardo R' not in consolidador.voluntarios_segundo_viaje
+        assert 'Pablo L' not in consolidador.voluntarios_segundo_viaje
+
+        optimizador = OptimizadorConductores(
+            bloques_ida, bloques_vuelta,
+            consolidador.todos_usuarios,
+            consolidador.disponibilidad_conductor,
+            consolidador.voluntarios_segundo_viaje
+        )
+        optimizador.optimizar()
+
+        dias_eduardo = {a['dia'] for a in optimizador.asignaciones_conductor.get('Eduardo R', [])}
+        dias_pablo = {a['dia'] for a in optimizador.asignaciones_conductor.get('Pablo L', [])}
+
+        assert len(dias_eduardo) == 2
+        assert len(dias_pablo) == 2
+        assert 'Magdalena S' not in optimizador.asignaciones_conductor
+        assert 'Gracia L' not in optimizador.asignaciones_conductor
 
 
 # =============================================================================

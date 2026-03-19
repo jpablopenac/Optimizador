@@ -8,6 +8,7 @@ app = Flask(__name__)
 
 # Configuración
 DATA_FILE = 'datos_usuarios.csv'
+COMPENSADORES_BLOQUEADOS_VOLUNTARIO = {'Eduardo R', 'Pablo L'}
 HEADERS = [
     'Nombre', 'Timestamp',
     'Lunes_Ida', 'Lunes_Vuelta', 'Lunes_Conductor', 'Lunes_Flex_Ida', 'Lunes_Flex_Vuelta',
@@ -72,6 +73,8 @@ def submit_data():
         
         # Voluntario segundo viaje
         voluntario = 'Si' if request.form.get('voluntario_segundo_viaje') else 'No'
+        if nombre in COMPENSADORES_BLOQUEADOS_VOLUNTARIO:
+            voluntario = 'No'
         fila_datos.append(voluntario)
         
         # Validar que si marca conductor, tenga ida y vuelta ese día
