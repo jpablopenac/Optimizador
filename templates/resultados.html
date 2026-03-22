@@ -114,6 +114,74 @@
             padding: 30px;
         }
 
+        .agenda-title {
+            margin: 12px 0 10px;
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #334;
+        }
+
+        .agenda-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            margin-bottom: 18px;
+        }
+
+        .agenda-table th {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 11px 8px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .agenda-table td {
+            border: 1px solid #eef2fb;
+            vertical-align: top;
+            padding: 10px;
+            min-width: 180px;
+        }
+
+        .agenda-slot {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-height: 110px;
+        }
+
+        .agenda-meta {
+            font-size: 0.82em;
+            color: #5f6780;
+        }
+
+        .rol-box {
+            background: #f8f9ff;
+            border: 1px solid #e6ebfc;
+            border-radius: 8px;
+            padding: 7px;
+        }
+
+        .rol-label {
+            display: block;
+            font-size: 0.78em;
+            font-weight: 700;
+            color: #445;
+            margin-bottom: 3px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .rol-value {
+            font-size: 0.86em;
+            color: #2e3650;
+            line-height: 1.35;
+            word-break: break-word;
+        }
+
         .day-title {
             margin: 25px 0 12px;
             font-size: 1.25em;
@@ -190,6 +258,11 @@
             text-align: center;
             background: #f8f9ff;
             border-top: 1px solid #f0f0f0;
+        }
+
+        .download-actions {
+            text-align: center;
+            margin: 12px 0 18px;
         }
 
         .action-btn {
@@ -313,49 +386,87 @@
                     🚗 Modelo 2: Asignación Óptima de Conductores
                 </div>
                 <div class="conductores-section">
-                    {% if conductores.grid_resultados %}
-                    {% for dia, horarios in conductores.grid_resultados.items() %}
-                    <div class="day-title">{{ dia }}</div>
-                    <table class="asignacion-table">
+                    {% if conductores.grillas_viajes %}
+                    <div id="grid-ida-container">
+                    <div class="agenda-title">🚌 Grilla de Ida (4 turnos x 4 dias)</div>
+                    <table class="agenda-table">
                         <thead>
                             <tr>
-                                <th>Tipo</th>
                                 <th>Hora</th>
-                                <th>Choferes asignados</th>
-                                <th>Pasajeros del bloque</th>
-                                <th>Resumen de cobertura</th>
-                                <th>Estado</th>
+                                {% for dia in conductores.grillas_viajes.ida.dias %}
+                                <th>{{ dia }}</th>
+                                {% endfor %}
                             </tr>
                         </thead>
                         <tbody>
-                            {% for hora, data in horarios.ida.items() %}
+                            {% for hora in conductores.grillas_viajes.ida.horas %}
                             <tr>
-                                <td><span class="tipo-chip">Ida</span></td>
-                                <td>{{ hora }}</td>
-                                <td class="lista-nombres">{{ data.choferes_asignados|join(', ') if data.choferes_asignados else '—' }}</td>
-                                <td class="lista-nombres">{{ data.pasajeros_bloque|join(', ') if data.pasajeros_bloque else '—' }}</td>
+                                <td class="time-cell">{{ hora }}</td>
+                                {% for dia in conductores.grillas_viajes.ida.dias %}
+                                {% set celda = conductores.grillas_viajes.ida.celdas[dia][hora] %}
                                 <td>
-                                    Demanda: {{ data.demanda }} · Capacidad: {{ data.capacidad }} · Cubiertos: {{ data.cubiertos }} · Déficit: {{ data.deficit }}
+                                    <div class="agenda-slot">
+                                        <div class="agenda-meta">Demanda: {{ celda.demanda }} · Capacidad: {{ celda.capacidad }} · Deficit: {{ celda.deficit }}</div>
+                                        <div class="rol-box">
+                                            <span class="rol-label">Chofer</span>
+                                            <div class="rol-value">{{ celda.choferes|join(', ') if celda.choferes else '—' }}</div>
+                                        </div>
+                                        <div class="rol-box">
+                                            <span class="rol-label">Pasajero</span>
+                                            <div class="rol-value">{{ celda.pasajeros|join(', ') if celda.pasajeros else '—' }}</div>
+                                        </div>
+                                    </div>
                                 </td>
-                                <td class="estado-{{ data.estado }}">{{ data.estado|upper }}</td>
-                            </tr>
-                            {% endfor %}
-                            {% for hora, data in horarios.vuelta.items() %}
-                            <tr>
-                                <td><span class="tipo-chip">Vuelta</span></td>
-                                <td>{{ hora }}</td>
-                                <td class="lista-nombres">{{ data.choferes_asignados|join(', ') if data.choferes_asignados else '—' }}</td>
-                                <td class="lista-nombres">{{ data.pasajeros_bloque|join(', ') if data.pasajeros_bloque else '—' }}</td>
-                                <td>
-                                    Demanda: {{ data.demanda }} · Capacidad: {{ data.capacidad }} · Cubiertos: {{ data.cubiertos }} · Déficit: {{ data.deficit }}
-                                </td>
-                                <td class="estado-{{ data.estado }}">{{ data.estado|upper }}</td>
+                                {% endfor %}
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
-                    {% endfor %}
-                    <div class="hint-text">Choferes asignados y pasajeros del bloque se muestran por día/hora para facilitar lectura de asignaciones.</div>
+                    </div>
+                    <div class="download-actions">
+                        <button type="button" class="action-btn" onclick="descargarGrid('grid-ida-container', 'horario_ida.jpg')">📷 Descargar Ida (JPG)</button>
+                    </div>
+
+                    <div id="grid-vuelta-container">
+                    <div class="agenda-title">🏠 Grilla de Vuelta (5 turnos x 4 dias)</div>
+                    <table class="agenda-table">
+                        <thead>
+                            <tr>
+                                <th>Hora</th>
+                                {% for dia in conductores.grillas_viajes.vuelta.dias %}
+                                <th>{{ dia }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for hora in conductores.grillas_viajes.vuelta.horas %}
+                            <tr>
+                                <td class="time-cell">{{ hora }}</td>
+                                {% for dia in conductores.grillas_viajes.vuelta.dias %}
+                                {% set celda = conductores.grillas_viajes.vuelta.celdas[dia][hora] %}
+                                <td>
+                                    <div class="agenda-slot">
+                                        <div class="agenda-meta">Demanda: {{ celda.demanda }} · Capacidad: {{ celda.capacidad }} · Deficit: {{ celda.deficit }}</div>
+                                        <div class="rol-box">
+                                            <span class="rol-label">Chofer</span>
+                                            <div class="rol-value">{{ celda.choferes|join(', ') if celda.choferes else '—' }}</div>
+                                        </div>
+                                        <div class="rol-box">
+                                            <span class="rol-label">Pasajero</span>
+                                            <div class="rol-value">{{ celda.pasajeros|join(', ') if celda.pasajeros else '—' }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    </div>
+                    <div class="download-actions">
+                        <button type="button" class="action-btn" onclick="descargarGrid('grid-vuelta-container', 'horario_vuelta.jpg')">📷 Descargar Vuelta (JPG)</button>
+                    </div>
+                    <div class="hint-text">Cada celda muestra claramente el listado de choferes y pasajeros por dia y horario.</div>
                     {% else %}
                     <p style="text-align: center; color: #666; padding: 20px;">
                         No se pudieron generar los resultados de asignación de conductores.
@@ -371,5 +482,29 @@
             <a href="/download-csv" class="action-btn secondary">📥 Descargar Datos</a>
         </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script>
+        function descargarGrid(containerId, nombreArchivo) {
+            const contenedor = document.getElementById(containerId);
+            if (!contenedor) {
+                alert('No se encontró el bloque a descargar.');
+                return;
+            }
+
+            html2canvas(contenedor, {
+                backgroundColor: '#ffffff',
+                scale: 2,
+                useCORS: true
+            }).then((canvas) => {
+                const enlace = document.createElement('a');
+                enlace.download = nombreArchivo;
+                enlace.href = canvas.toDataURL('image/jpeg', 0.95);
+                enlace.click();
+            }).catch(() => {
+                alert('No se pudo generar la imagen. Intenta nuevamente.');
+            });
+        }
+    </script>
 </body>
 </html>

@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Usuario - Admin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 26px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .content {
+            padding: 24px;
+        }
+
+        .field {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #334;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            border: 2px solid #d8deee;
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 16px;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.12);
+        }
+
+        .section-title {
+            margin: 20px 0 12px;
+            color: #445;
+            font-size: 1.2em;
+            font-weight: 700;
+        }
+
+        .schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            margin-bottom: 18px;
+        }
+
+        .schedule-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .schedule-table td {
+            border: 1px solid #eef1fb;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .time-cell {
+            background: #f4f8ff;
+            color: #334;
+            font-weight: 600;
+        }
+
+        .opciones {
+            margin-top: 6px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 10px;
+        }
+
+        .opcion {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f8f9ff;
+            border: 1px solid #e8ebf7;
+            border-radius: 999px;
+            padding: 10px 12px;
+        }
+
+        .opcion label {
+            margin: 0;
+            font-weight: 500;
+        }
+
+        .acciones {
+            margin-top: 24px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 10px;
+            padding: 12px 24px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            color: white;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .btn.sec {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 16px;
+            }
+
+            .schedule-table {
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Editar Registro de Usuario</h1>
+            <p>Indice interno: {{ indice }}</p>
+        </div>
+
+        <div class="content">
+            <form action="/admin/editar/{{ indice }}" method="POST">
+                <div class="field">
+                    <label for="nombre">Nombre *</label>
+                    <input type="text" id="nombre" name="nombre" value="{{ usuario.Nombre }}" required>
+                </div>
+
+                <div class="section-title">Viaje de Ida</div>
+                <table class="schedule-table">
+                    <thead>
+                        <tr>
+                            <th>Hora</th>
+                            {% for dia in dias %}
+                            <th>{{ dia.label }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for hora in horarios_ida %}
+                        <tr>
+                            <td class="time-cell">{{ hora }}</td>
+                            {% for dia in dias %}
+                            <td>
+                                <input type="radio"
+                                       name="{{ dia.id }}_ida"
+                                       value="{{ hora }}"
+                                       {% if usuario[dia.label + '_Ida'] == hora %}checked{% endif %}>
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <div class="section-title">Viaje de Vuelta</div>
+                <table class="schedule-table">
+                    <thead>
+                        <tr>
+                            <th>Hora</th>
+                            {% for dia in dias %}
+                            <th>{{ dia.label }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for hora in horarios_vuelta %}
+                        <tr>
+                            <td class="time-cell">{{ hora }}</td>
+                            {% for dia in dias %}
+                            <td>
+                                <input type="radio"
+                                       name="{{ dia.id }}_vuelta"
+                                       value="{{ hora }}"
+                                       {% if usuario[dia.label + '_Vuelta'] == hora %}checked{% endif %}>
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <div class="section-title">Preferencias adicionales por dia</div>
+                {% for dia in dias %}
+                <div style="margin-bottom: 10px;">
+                    <strong>{{ dia.label }}</strong>
+                    <div class="opciones">
+                        <div class="opcion">
+                            <input type="checkbox" id="{{ dia.id }}_conductor" name="{{ dia.id }}_conductor"
+                                   {% if usuario[dia.label + '_Conductor'] == 'Si' %}checked{% endif %}>
+                            <label for="{{ dia.id }}_conductor">Conductor disponible</label>
+                        </div>
+                        <div class="opcion">
+                            <input type="checkbox" id="{{ dia.id }}_flex_ida" name="{{ dia.id }}_flex_ida"
+                                   {% if usuario[dia.label + '_Flex_Ida'] == 'Si' %}checked{% endif %}>
+                            <label for="{{ dia.id }}_flex_ida">Permite flexibilidad ida</label>
+                        </div>
+                        <div class="opcion">
+                            <input type="checkbox" id="{{ dia.id }}_flex_vuelta" name="{{ dia.id }}_flex_vuelta"
+                                   {% if usuario[dia.label + '_Flex_Vuelta'] == 'Si' %}checked{% endif %}>
+                            <label for="{{ dia.id }}_flex_vuelta">Permite flexibilidad vuelta</label>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+
+                <div class="section-title">Voluntario segundo viaje</div>
+                <div class="opciones">
+                    <div class="opcion">
+                        <input type="checkbox" id="voluntario_segundo_viaje" name="voluntario_segundo_viaje"
+                               {% if usuario.Voluntario_Segundo_Viaje == 'Si' and not bloqueado_voluntario %}checked{% endif %}
+                               {% if bloqueado_voluntario %}disabled{% endif %}>
+                        <label for="voluntario_segundo_viaje">Disponible para 2 dias a la semana</label>
+                    </div>
+                </div>
+                {% if bloqueado_voluntario %}
+                <p style="margin-top: 8px; color: #8a3b1f; font-size: 0.95em;">
+                    Este usuario tiene bloqueo de voluntario por regla de compensacion.
+                </p>
+                {% endif %}
+
+                <div class="acciones">
+                    <button type="submit" class="btn">Guardar Cambios</button>
+                    <a href="/admin" class="btn sec">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

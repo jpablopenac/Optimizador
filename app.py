@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, jsonify
 import csv
 import os
 from datetime import datetime
-from optimizador import ejecutar_optimizacion, CAPACIDAD_VEHICULO
+from optimizador import ejecutar_optimizacion, CAPACIDAD_VEHICULO, HORARIOS_IDA, HORARIOS_VUELTA
 
 app = Flask(__name__)
 
@@ -15,9 +15,71 @@ HEADERS = [
     'Martes_Ida', 'Martes_Vuelta', 'Martes_Conductor', 'Martes_Flex_Ida', 'Martes_Flex_Vuelta',
     'Miercoles_Ida', 'Miercoles_Vuelta', 'Miercoles_Conductor', 'Miercoles_Flex_Ida', 'Miercoles_Flex_Vuelta',
     'Jueves_Ida', 'Jueves_Vuelta', 'Jueves_Conductor', 'Jueves_Flex_Ida', 'Jueves_Flex_Vuelta',
-    'Viernes_Ida', 'Viernes_Vuelta', 'Viernes_Conductor', 'Viernes_Flex_Ida', 'Viernes_Flex_Vuelta',
     'Voluntario_Segundo_Viaje'
 ]
+DIAS_FORM = ['lunes', 'martes', 'miercoles', 'jueves']
+DIAS_TITULO = ['Lunes', 'Martes', 'Miercoles', 'Jueves']
+
+
+def leer_datos_csv():
+    """Leer todos los registros del CSV en memoria"""
+    if not os.path.exists(DATA_FILE):
+        return []
+
+    # utf-8-sig handles files with or without BOM, avoiding '\ufeffNombre' as header.
+    with open(DATA_FILE, 'r', encoding='utf-8-sig') as file:
+        reader = csv.DictReader(file)
+        return list(reader)
+
+
+def guardar_datos_csv(datos):
+    """Sobrescribe el CSV con la lista de registros proporcionada"""
+    with open(DATA_FILE, 'w', newline='', encoding='utf-8') as file:
+        # Ignora columnas heredadas de versiones anteriores.
+        writer = csv.DictWriter(file, fieldnames=HEADERS, extrasaction='ignore')
+        writer.writeheader()
+        writer.writerows(datos)
+
+
+def construir_fila_desde_form(formulario):
+    """Construye y valida una fila del CSV desde los datos del formulario"""
+    nombre = formulario.get('nombre', '').strip()
+    if not nombre:
+        return None, "Error: El nombre es requerido"
+
+    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    fila_datos = [nombre, timestamp]
+
+    for dia in DIAS_FORM:
+        ida = formulario.get(f'{dia}_ida', '')
+        vuelta = formulario.get(f'{dia}_vuelta', '')
+        conductor = 'Si' if formulario.get(f'{dia}_conductor') else 'No'
+        flex_ida = 'Si' if formulario.get(f'{dia}_flex_ida') else 'No'
+        flex_vuelta = 'Si' if formulario.get(f'{dia}_flex_vuelta') else 'No'
+
+        fila_datos.extend([ida, vuelta, conductor, flex_ida, flex_vuelta])
+
+    voluntario = 'Si' if formulario.get('voluntario_segundo_viaje') else 'No'
+    if nombre in COMPENSADORES_BLOQUEADOS_VOLUNTARIO:
+        voluntario = 'No'
+    fila_datos.append(voluntario)
+
+    for i, dia in enumerate(DIAS_FORM):
+        if fila_datos[2 + i * 5 + 2] == 'Si':
+            ida_val = fila_datos[2 + i * 5]
+            vuelta_val = fila_datos[2 + i * 5 + 1]
+            if not ida_val or not vuelta_val:
+                return None, (
+                    f"Error: Si estás dispuesto a manejar el {dia.capitalize()}, "
+                    "debes seleccionar una hora de ida y vuelta para ese día"
+                )
+
+    return fila_datos, None
+
+
+def fila_a_dict(fila_datos):
+    """Convierte una fila en lista al formato dict de DictWriter"""
+    return {header: fila_datos[idx] for idx, header in enumerate(HEADERS)}
 
 def inicializar_csv():
     """Crear archivo CSV si no existe"""
@@ -33,59 +95,12 @@ def index():
 @app.route('/submit', methods=['POST'])
 def submit_data():
     try:
-        # Inicializar CSV si no existe
         inicializar_csv()
-        
-        # Recopilar datos del formulario
-        nombre = request.form.get('nombre', '').strip()
-        if not nombre:
-            return "Error: El nombre es requerido", 400
-        
-        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        
-        # Días de la semana
-        dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes']
-        
-        # Preparar fila de datos
-        fila_datos = [nombre, timestamp]
-        
-        # Procesar cada día
-        for dia in dias:
-            # Ida (radio button - solo una opción)
-            ida = request.form.get(f'{dia}_ida', '')
-            fila_datos.append(ida)
-            
-            # Vuelta (radio button - solo una opción)
-            vuelta = request.form.get(f'{dia}_vuelta', '')
-            fila_datos.append(vuelta)
-            
-            # Conductor (checkbox)
-            conductor = 'Si' if request.form.get(f'{dia}_conductor') else 'No'
-            fila_datos.append(conductor)
-            
-            # Flexibilidad ida (checkbox)
-            flex_ida = 'Si' if request.form.get(f'{dia}_flex_ida') else 'No'
-            fila_datos.append(flex_ida)
-            
-            # Flexibilidad vuelta (checkbox)
-            flex_vuelta = 'Si' if request.form.get(f'{dia}_flex_vuelta') else 'No'
-            fila_datos.append(flex_vuelta)
-        
-        # Voluntario segundo viaje
-        voluntario = 'Si' if request.form.get('voluntario_segundo_viaje') else 'No'
-        if nombre in COMPENSADORES_BLOQUEADOS_VOLUNTARIO:
-            voluntario = 'No'
-        fila_datos.append(voluntario)
-        
-        # Validar que si marca conductor, tenga ida y vuelta ese día
-        for i, dia in enumerate(dias):
-            if fila_datos[2 + i*5 + 2] == 'Si':  # Si es conductor
-                ida_val = fila_datos[2 + i*5]     # Ida
-                vuelta_val = fila_datos[2 + i*5 + 1]  # Vuelta
-                if not ida_val or not vuelta_val:
-                    return f"Error: Si estás dispuesto a manejar el {dia.capitalize()}, debes seleccionar una hora de ida y vuelta para ese día", 400
-        
-        # Escribir al archivo CSV
+
+        fila_datos, error = construir_fila_desde_form(request.form)
+        if error:
+            return error, 400
+
         with open(DATA_FILE, 'a', newline='', encoding='utf-8') as file:
             writer = csv.writer(file)
             writer.writerow(fila_datos)
@@ -121,16 +136,66 @@ def success():
 def admin_panel():
     """Panel de administración para ver datos y ejecutar optimización"""
     try:
-        # Leer datos del CSV
-        datos = []
-        if os.path.exists(DATA_FILE):
-            with open(DATA_FILE, 'r', encoding='utf-8') as file:
-                reader = csv.DictReader(file)
-                datos = list(reader)
-        
+        datos = leer_datos_csv()
         return render_template('admin.html', datos=datos, total_usuarios=len(datos))
     except Exception as e:
         return f"Error al cargar datos: {str(e)}", 500
+
+
+@app.route('/admin/editar/<int:indice>', methods=['GET', 'POST'])
+def admin_editar_usuario(indice):
+    """Permite editar horarios/preferencias de un registro desde admin"""
+    try:
+        inicializar_csv()
+        datos = leer_datos_csv()
+
+        if indice < 0 or indice >= len(datos):
+            return "Registro no encontrado", 404
+
+        if request.method == 'POST':
+            fila_datos, error = construir_fila_desde_form(request.form)
+            if error:
+                return error, 400
+
+            datos[indice] = fila_a_dict(fila_datos)
+            guardar_datos_csv(datos)
+            return redirect(url_for('admin_panel'))
+
+        usuario = datos[indice]
+        return render_template(
+            'admin_editar.html',
+            usuario=usuario,
+            indice=indice,
+            dias=[
+                {'id': 'lunes', 'label': 'Lunes'},
+                {'id': 'martes', 'label': 'Martes'},
+                {'id': 'miercoles', 'label': 'Miercoles'},
+                {'id': 'jueves', 'label': 'Jueves'},
+            ],
+            dias_titulo=DIAS_TITULO,
+            horarios_ida=HORARIOS_IDA,
+            horarios_vuelta=HORARIOS_VUELTA,
+            bloqueado_voluntario=usuario.get('Nombre', '') in COMPENSADORES_BLOQUEADOS_VOLUNTARIO
+        )
+    except Exception as e:
+        return f"Error al editar registro: {str(e)}", 500
+
+
+@app.route('/admin/eliminar/<int:indice>', methods=['POST'])
+def admin_eliminar_usuario(indice):
+    """Elimina un registro de usuario por índice desde admin"""
+    try:
+        inicializar_csv()
+        datos = leer_datos_csv()
+
+        if indice < 0 or indice >= len(datos):
+            return "Registro no encontrado", 404
+
+        datos.pop(indice)
+        guardar_datos_csv(datos)
+        return redirect(url_for('admin_panel'))
+    except Exception as e:
+        return f"Error al eliminar registro: {str(e)}", 500
 
 @app.route('/download-csv')
 def download_csv():
@@ -216,7 +281,7 @@ def api_estadisticas():
         total_usuarios = len(datos)
         conductores_totales = sum(
             (datos[f'{dia}_Conductor'] == 'Si').sum()
-            for dia in ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes']
+            for dia in DIAS_TITULO
         )
         
         return jsonify({

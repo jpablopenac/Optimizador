@@ -103,6 +103,10 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
 
+        .action-btn.danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #d64545 100%);
+        }
+
         .data-table {
             margin: 30px;
             background: white;
@@ -246,8 +250,8 @@
                             <th>Martes</th>
                             <th>Miércoles</th>
                             <th>Jueves</th>
-                            <th>Viernes</th>
                             <th>Voluntario</th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -288,19 +292,17 @@
                                 {% endif %}
                             </td>
                             <td>
-                                {% if usuario.Viernes_Ida or usuario.Viernes_Vuelta %}
-                                    I:{{ usuario.Viernes_Ida or '-' }} / V:{{ usuario.Viernes_Vuelta or '-' }}
-                                    {% if usuario.Viernes_Conductor == 'Si' %} 🚗{% endif %}
-                                {% else %}
-                                    -
-                                {% endif %}
-                            </td>
-                            <td>
                                 {% if usuario.Voluntario_Segundo_Viaje == 'Si' %}
                                     ✅ Sí
                                 {% else %}
                                     ❌ No
                                 {% endif %}
+                            </td>
+                            <td>
+                                <a href="/admin/editar/{{ loop.index0 }}" class="action-btn" style="padding: 8px 14px; margin: 0; font-size: 0.78em; letter-spacing: 0.3px;">✏️ Editar</a>
+                                <form action="/admin/eliminar/{{ loop.index0 }}" method="POST" style="display: inline;" onsubmit="return confirm('¿Eliminar este usuario? Esta acción no se puede deshacer.');">
+                                    <button type="submit" class="action-btn danger" style="padding: 8px 14px; margin: 6px 0 0 0; font-size: 0.78em; letter-spacing: 0.3px; border: none; cursor: pointer;">🗑️ Eliminar</button>
+                                </form>
                             </td>
                         </tr>
                         {% endfor %}
@@ -334,7 +336,7 @@
             
             datos.forEach(usuario => {
                 // Contar viajes
-                const dias = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes'];
+                const dias = ['Lunes', 'Martes', 'Miercoles', 'Jueves'];
                 dias.forEach(dia => {
                     if (usuario[dia + '_Ida']) totalViajes++;
                     if (usuario[dia + '_Vuelta']) totalViajes++;

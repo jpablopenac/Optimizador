@@ -1,5 +1,5 @@
-"""
-Tests Unitarios para el Sistema de Optimización de Transporte
+﻿"""
+Tests Unitarios para el Sistema de OptimizaciÃ³n de Transporte
 ==============================================================
 Ejecutar con: python -m pytest test_optimizador.py -v
 O directamente: python test_optimizador.py
@@ -32,52 +32,52 @@ from optimizador import (
 def csv_basico():
     """CSV con 3 usuarios simples"""
     return """Nombre,Timestamp,Lunes_Ida,Lunes_Vuelta,Lunes_Conductor,Lunes_Flex_Ida,Lunes_Flex_Vuelta,Martes_Ida,Martes_Vuelta,Martes_Conductor,Martes_Flex_Ida,Martes_Flex_Vuelta,Miercoles_Ida,Miercoles_Vuelta,Miercoles_Conductor,Miercoles_Flex_Ida,Miercoles_Flex_Vuelta,Jueves_Ida,Jueves_Vuelta,Jueves_Conductor,Jueves_Flex_Ida,Jueves_Flex_Vuelta,Viernes_Ida,Viernes_Vuelta,Viernes_Conductor,Viernes_Flex_Ida,Viernes_Flex_Vuelta,Voluntario_Segundo_Viaje
-Ana,2026-01-01 10:00:00,8:20,16:00,Si,No,No,8:20,16:00,Si,No,No,8:20,16:00,Si,No,No,8:20,16:00,Si,No,No,8:20,16:00,Si,No,No,No
-Pedro,2026-01-01 10:01:00,8:20,16:00,Si,No,No,8:20,16:00,Si,No,No,8:20,16:00,Si,No,No,8:20,16:00,Si,No,No,8:20,16:00,Si,No,No,No
-María,2026-01-01 10:02:00,8:20,16:00,Si,No,No,8:20,16:00,Si,No,No,8:20,16:00,Si,No,No,8:20,16:00,Si,No,No,8:20,16:00,Si,No,No,No"""
+Ana,2026-01-01 10:00:00,8:20,16:00,Si,No,No,8:20,16:00,Si,No,No,8:20,16:00,Si,No,No,8:20,16:00,Si,No,No,No
+Pedro,2026-01-01 10:01:00,8:20,16:00,Si,No,No,8:20,16:00,Si,No,No,8:20,16:00,Si,No,No,8:20,16:00,Si,No,No,No
+MarÃ­a,2026-01-01 10:02:00,8:20,16:00,Si,No,No,8:20,16:00,Si,No,No,8:20,16:00,Si,No,No,8:20,16:00,Si,No,No,No"""
 
 
 @pytest.fixture
 def csv_con_flexibles():
     """CSV con usuarios flexibles"""
     return """Nombre,Timestamp,Lunes_Ida,Lunes_Vuelta,Lunes_Conductor,Lunes_Flex_Ida,Lunes_Flex_Vuelta,Martes_Ida,Martes_Vuelta,Martes_Conductor,Martes_Flex_Ida,Martes_Flex_Vuelta,Miercoles_Ida,Miercoles_Vuelta,Miercoles_Conductor,Miercoles_Flex_Ida,Miercoles_Flex_Vuelta,Jueves_Ida,Jueves_Vuelta,Jueves_Conductor,Jueves_Flex_Ida,Jueves_Flex_Vuelta,Viernes_Ida,Viernes_Vuelta,Viernes_Conductor,Viernes_Flex_Ida,Viernes_Flex_Vuelta,Voluntario_Segundo_Viaje
-Ana,2026-01-01 10:00:00,9:40,17:20,Si,Si,Si,,,No,No,No,,,No,No,No,,,No,No,No,,,No,No,No,No
-Pedro,2026-01-01 10:01:00,8:20,16:00,Si,No,No,,,No,No,No,,,No,No,No,,,No,No,No,,,No,No,No,No"""
+Ana,2026-01-01 10:00:00,9:40,17:20,Si,Si,Si,,,No,No,No,,,No,No,No,,,No,No,No,No
+Pedro,2026-01-01 10:01:00,8:20,16:00,Si,No,No,,,No,No,No,,,No,No,No,,,No,No,No,No"""
 
 
 @pytest.fixture
 def csv_sin_conductor():
     """CSV con usuario que no puede manejar"""
     return """Nombre,Timestamp,Lunes_Ida,Lunes_Vuelta,Lunes_Conductor,Lunes_Flex_Ida,Lunes_Flex_Vuelta,Martes_Ida,Martes_Vuelta,Martes_Conductor,Martes_Flex_Ida,Martes_Flex_Vuelta,Miercoles_Ida,Miercoles_Vuelta,Miercoles_Conductor,Miercoles_Flex_Ida,Miercoles_Flex_Vuelta,Jueves_Ida,Jueves_Vuelta,Jueves_Conductor,Jueves_Flex_Ida,Jueves_Flex_Vuelta,Viernes_Ida,Viernes_Vuelta,Viernes_Conductor,Viernes_Flex_Ida,Viernes_Flex_Vuelta,Voluntario_Segundo_Viaje
-Ana,2026-01-01 10:00:00,8:20,16:00,Si,No,No,8:20,16:00,Si,No,No,,,No,No,No,,,No,No,No,,,No,No,No,No
-Luis,2026-01-01 10:01:00,8:20,16:00,No,No,No,8:20,16:00,No,No,No,,,No,No,No,,,No,No,No,,,No,No,No,No"""
+Ana,2026-01-01 10:00:00,8:20,16:00,Si,No,No,8:20,16:00,Si,No,No,,,No,No,No,,,No,No,No,No
+Luis,2026-01-01 10:01:00,8:20,16:00,No,No,No,8:20,16:00,No,No,No,,,No,No,No,,,No,No,No,No"""
 
 
 @pytest.fixture
 def csv_con_voluntario():
     """CSV con voluntario de segundo viaje"""
     return """Nombre,Timestamp,Lunes_Ida,Lunes_Vuelta,Lunes_Conductor,Lunes_Flex_Ida,Lunes_Flex_Vuelta,Martes_Ida,Martes_Vuelta,Martes_Conductor,Martes_Flex_Ida,Martes_Flex_Vuelta,Miercoles_Ida,Miercoles_Vuelta,Miercoles_Conductor,Miercoles_Flex_Ida,Miercoles_Flex_Vuelta,Jueves_Ida,Jueves_Vuelta,Jueves_Conductor,Jueves_Flex_Ida,Jueves_Flex_Vuelta,Viernes_Ida,Viernes_Vuelta,Viernes_Conductor,Viernes_Flex_Ida,Viernes_Flex_Vuelta,Voluntario_Segundo_Viaje
-Ana,2026-01-01 10:00:00,8:20,16:00,Si,No,No,8:20,16:00,Si,No,No,8:20,16:00,Si,No,No,8:20,16:00,Si,No,No,8:20,16:00,Si,No,No,Si
-Pedro,2026-01-01 10:01:00,8:20,16:00,Si,No,No,8:20,16:00,Si,No,No,,,No,No,No,,,No,No,No,,,No,No,No,No"""
+Ana,2026-01-01 10:00:00,8:20,16:00,Si,No,No,8:20,16:00,Si,No,No,8:20,16:00,Si,No,No,8:20,16:00,Si,No,No,Si
+Pedro,2026-01-01 10:01:00,8:20,16:00,Si,No,No,8:20,16:00,Si,No,No,,,No,No,No,,,No,No,No,No"""
 
 
 @pytest.fixture
 def csv_duplicados():
     """CSV con nombres duplicados"""
     return """Nombre,Timestamp,Lunes_Ida,Lunes_Vuelta,Lunes_Conductor,Lunes_Flex_Ida,Lunes_Flex_Vuelta,Martes_Ida,Martes_Vuelta,Martes_Conductor,Martes_Flex_Ida,Martes_Flex_Vuelta,Miercoles_Ida,Miercoles_Vuelta,Miercoles_Conductor,Miercoles_Flex_Ida,Miercoles_Flex_Vuelta,Jueves_Ida,Jueves_Vuelta,Jueves_Conductor,Jueves_Flex_Ida,Jueves_Flex_Vuelta,Viernes_Ida,Viernes_Vuelta,Viernes_Conductor,Viernes_Flex_Ida,Viernes_Flex_Vuelta,Voluntario_Segundo_Viaje
-Ana,2026-01-01 08:00:00,8:20,16:00,No,No,No,,,No,No,No,,,No,No,No,,,No,No,No,,,No,No,No,No
-Ana,2026-01-01 10:00:00,8:20,16:00,Si,No,No,8:20,16:00,Si,No,No,,,No,No,No,,,No,No,No,,,No,No,No,No
-Pedro,2026-01-01 10:01:00,8:20,16:00,Si,No,No,,,No,No,No,,,No,No,No,,,No,No,No,,,No,No,No,No"""
+Ana,2026-01-01 08:00:00,8:20,16:00,No,No,No,,,No,No,No,,,No,No,No,,,No,No,No,No
+Ana,2026-01-01 10:00:00,8:20,16:00,Si,No,No,8:20,16:00,Si,No,No,,,No,No,No,,,No,No,No,No
+Pedro,2026-01-01 10:01:00,8:20,16:00,Si,No,No,,,No,No,No,,,No,No,No,,,No,No,No,No"""
 
 
 @pytest.fixture
 def csv_compensacion_exentos():
     """CSV con exentos compensados por hermanos"""
     return """Nombre,Timestamp,Lunes_Ida,Lunes_Vuelta,Lunes_Conductor,Lunes_Flex_Ida,Lunes_Flex_Vuelta,Martes_Ida,Martes_Vuelta,Martes_Conductor,Martes_Flex_Ida,Martes_Flex_Vuelta,Miercoles_Ida,Miercoles_Vuelta,Miercoles_Conductor,Miercoles_Flex_Ida,Miercoles_Flex_Vuelta,Jueves_Ida,Jueves_Vuelta,Jueves_Conductor,Jueves_Flex_Ida,Jueves_Flex_Vuelta,Viernes_Ida,Viernes_Vuelta,Viernes_Conductor,Viernes_Flex_Ida,Viernes_Flex_Vuelta,Voluntario_Segundo_Viaje
-Magdalena S,2026-03-15 10:00:00,8:20,17:20,No,No,No,8:20,17:20,No,No,No,8:20,17:20,No,No,No,8:20,17:20,No,No,No,,,No,No,No,No
-Eduardo R,2026-03-15 10:01:00,8:20,17:20,Si,No,No,8:20,17:20,Si,No,No,8:20,17:20,Si,No,No,8:20,17:20,Si,No,No,,,No,No,No,Si
-Gracia L,2026-03-15 10:02:00,8:20,17:20,No,No,No,8:20,17:20,No,No,No,8:20,,No,No,No,8:20,17:20,No,No,No,,,No,No,No,No
-Pablo L,2026-03-15 10:03:00,8:20,17:20,Si,No,No,8:20,17:20,Si,No,No,8:20,17:20,Si,No,No,8:20,17:20,Si,No,No,,,No,No,No,Si"""
+Magdalena S,2026-03-15 10:00:00,8:20,17:20,No,No,No,8:20,17:20,No,No,No,8:20,17:20,No,No,No,8:20,17:20,No,No,No,No
+Eduardo R,2026-03-15 10:01:00,8:20,17:20,Si,No,No,8:20,17:20,Si,No,No,8:20,17:20,Si,No,No,8:20,17:20,Si,No,No,Si
+Gracia L,2026-03-15 10:02:00,8:20,17:20,No,No,No,8:20,17:20,No,No,No,8:20,,No,No,No,8:20,17:20,No,No,No,No
+Pablo L,2026-03-15 10:03:00,8:20,17:20,Si,No,No,8:20,17:20,Si,No,No,8:20,17:20,Si,No,No,8:20,17:20,Si,No,No,Si"""
 
 
 def crear_archivo_temporal(contenido_csv):
@@ -173,7 +173,7 @@ class TestConsolidadorDemanda:
         consolidador = ConsolidadorDemanda(datos)
         consolidador.ejecutar()
         
-        # Todos son conductores todos los días
+        # Todos son conductores todos los dÃ­as
         assert len(consolidador.conductores_por_dia['Lunes']) == 3
     
     def test_movimiento_flexibles(self, csv_con_flexibles):
@@ -182,8 +182,8 @@ class TestConsolidadorDemanda:
         consolidador.ejecutar()
         
         stats = consolidador.obtener_estadisticas()
-        # Ana es flexible y debería moverse de 9:40 a 8:20 (donde está Pedro)
-        assert stats['movimientos_realizados'] >= 0  # Puede o no moverse según la optimización
+        # Ana es flexible y deberÃ­a moverse de 9:40 a 8:20 (donde estÃ¡ Pedro)
+        assert stats['movimientos_realizados'] >= 0  # Puede o no moverse segÃºn la optimizaciÃ³n
     
     def test_detecta_usuarios_sin_disponibilidad(self, csv_sin_conductor):
         datos = pd.read_csv(StringIO(csv_sin_conductor))
@@ -220,7 +220,7 @@ class TestOptimizadorConductores:
     """Tests para la clase OptimizadorConductores"""
     
     def test_regla_de_oro_todos_manejan(self, csv_basico):
-        """Verifica que todos los usuarios válidos manejan al menos 1 vez"""
+        """Verifica que todos los usuarios vÃ¡lidos manejan al menos 1 vez"""
         datos = pd.read_csv(StringIO(csv_basico))
         consolidador = ConsolidadorDemanda(datos)
         bloques_ida, bloques_vuelta = consolidador.ejecutar()
@@ -239,7 +239,7 @@ class TestOptimizadorConductores:
         assert resumen['total_conductores_asignados'] == 3
     
     def test_voluntario_puede_manejar_dos_veces(self, csv_con_voluntario):
-        """Verifica que voluntarios pueden manejar hasta 2 días"""
+        """Verifica que voluntarios pueden manejar hasta 2 dÃ­as"""
         datos = pd.read_csv(StringIO(csv_con_voluntario))
         consolidador = ConsolidadorDemanda(datos)
         bloques_ida, bloques_vuelta = consolidador.ejecutar()
@@ -252,13 +252,13 @@ class TestOptimizadorConductores:
         )
         optimizador.optimizar()
         
-        # Ana es voluntaria, puede manejar como máximo 2 días
+        # Ana es voluntaria, puede manejar como mÃ¡ximo 2 dÃ­as
         asignaciones_ana = optimizador.asignaciones_conductor.get('Ana', [])
         dias_asignados_ana = {a['dia'] for a in asignaciones_ana}
         assert len(dias_asignados_ana) <= 2
 
     def test_mismo_chofer_en_ida_y_vuelta_por_dia(self, csv_basico):
-        """Si un chofer maneja ida en un día, debe manejar también la vuelta ese día."""
+        """Si un chofer maneja ida en un dÃ­a, debe manejar tambiÃ©n la vuelta ese dÃ­a."""
         datos = pd.read_csv(StringIO(csv_basico))
         consolidador = ConsolidadorDemanda(datos)
         bloques_ida, bloques_vuelta = consolidador.ejecutar()
@@ -319,12 +319,12 @@ class TestOptimizadorConductores:
                 assert r.capacidad_total == expected_capacidad
 
     def test_exentos_compensados_y_limite_compensador(self, csv_compensacion_exentos):
-        """Exentos no manejan y compensadores manejan exactamente 2 días."""
+        """Exentos no manejan y compensadores manejan exactamente 2 dÃ­as."""
         datos = pd.read_csv(StringIO(csv_compensacion_exentos))
         consolidador = ConsolidadorDemanda(datos)
         bloques_ida, bloques_vuelta = consolidador.ejecutar()
 
-        # Aunque en CSV estén en Si, estos nombres deben quedar bloqueados como voluntarios.
+        # Aunque en CSV estÃ©n en Si, estos nombres deben quedar bloqueados como voluntarios.
         assert 'Eduardo R' not in consolidador.voluntarios_segundo_viaje
         assert 'Pablo L' not in consolidador.voluntarios_segundo_viaje
 
@@ -346,11 +346,11 @@ class TestOptimizadorConductores:
 
 
 # =============================================================================
-# TESTS: Función Principal ejecutar_optimizacion
+# TESTS: FunciÃ³n Principal ejecutar_optimizacion
 # =============================================================================
 
 class TestEjecutarOptimizacion:
-    """Tests para la función principal"""
+    """Tests para la funciÃ³n principal"""
     
     def test_archivo_no_encontrado(self):
         resultado = ejecutar_optimizacion('archivo_inexistente.csv')
@@ -367,7 +367,7 @@ class TestEjecutarOptimizacion:
             os.unlink(path)
     
     def test_elimina_duplicados(self, csv_duplicados):
-        """Verifica que duplicados se eliminan manteniendo el más reciente"""
+        """Verifica que duplicados se eliminan manteniendo el mÃ¡s reciente"""
         path = crear_archivo_temporal(csv_duplicados)
         try:
             resultado = ejecutar_optimizacion(path)
@@ -396,7 +396,7 @@ class TestEjecutarOptimizacion:
             os.unlink(path)
     
     def test_csv_vacio(self):
-        """Verifica manejo de CSV vacío"""
+        """Verifica manejo de CSV vacÃ­o"""
         csv_vacio = "Nombre,Timestamp,Lunes_Ida\n"
         path = crear_archivo_temporal(csv_vacio)
         try:
@@ -407,16 +407,16 @@ class TestEjecutarOptimizacion:
 
 
 # =============================================================================
-# TESTS: Casos Límite
+# TESTS: Casos LÃ­mite
 # =============================================================================
 
 class TestCasosLimite:
     """Tests para casos extremos"""
     
     def test_usuario_unico(self):
-        """Un solo usuario que debe manejarse a sí mismo"""
+        """Un solo usuario que debe manejarse a sÃ­ mismo"""
         csv = """Nombre,Timestamp,Lunes_Ida,Lunes_Vuelta,Lunes_Conductor,Lunes_Flex_Ida,Lunes_Flex_Vuelta,Martes_Ida,Martes_Vuelta,Martes_Conductor,Martes_Flex_Ida,Martes_Flex_Vuelta,Miercoles_Ida,Miercoles_Vuelta,Miercoles_Conductor,Miercoles_Flex_Ida,Miercoles_Flex_Vuelta,Jueves_Ida,Jueves_Vuelta,Jueves_Conductor,Jueves_Flex_Ida,Jueves_Flex_Vuelta,Viernes_Ida,Viernes_Vuelta,Viernes_Conductor,Viernes_Flex_Ida,Viernes_Flex_Vuelta,Voluntario_Segundo_Viaje
-Solo,2026-01-01 10:00:00,8:20,16:00,Si,No,No,,,No,No,No,,,No,No,No,,,No,No,No,,,No,No,No,No"""
+Solo,2026-01-01 10:00:00,8:20,16:00,Si,No,No,,,No,No,No,,,No,No,No,,,No,No,No,No"""
         
         path = crear_archivo_temporal(csv)
         try:
@@ -431,11 +431,11 @@ Solo,2026-01-01 10:00:00,8:20,16:00,Si,No,No,,,No,No,No,,,No,No,No,,,No,No,No,,,
     def test_todos_mismo_horario(self):
         """Todos los usuarios en el mismo horario"""
         csv = """Nombre,Timestamp,Lunes_Ida,Lunes_Vuelta,Lunes_Conductor,Lunes_Flex_Ida,Lunes_Flex_Vuelta,Martes_Ida,Martes_Vuelta,Martes_Conductor,Martes_Flex_Ida,Martes_Flex_Vuelta,Miercoles_Ida,Miercoles_Vuelta,Miercoles_Conductor,Miercoles_Flex_Ida,Miercoles_Flex_Vuelta,Jueves_Ida,Jueves_Vuelta,Jueves_Conductor,Jueves_Flex_Ida,Jueves_Flex_Vuelta,Viernes_Ida,Viernes_Vuelta,Viernes_Conductor,Viernes_Flex_Ida,Viernes_Flex_Vuelta,Voluntario_Segundo_Viaje
-A,2026-01-01 10:00:00,8:20,16:00,Si,No,No,,,No,No,No,,,No,No,No,,,No,No,No,,,No,No,No,No
-B,2026-01-01 10:01:00,8:20,16:00,Si,No,No,,,No,No,No,,,No,No,No,,,No,No,No,,,No,No,No,No
-C,2026-01-01 10:02:00,8:20,16:00,Si,No,No,,,No,No,No,,,No,No,No,,,No,No,No,,,No,No,No,No
-D,2026-01-01 10:03:00,8:20,16:00,Si,No,No,,,No,No,No,,,No,No,No,,,No,No,No,,,No,No,No,No
-E,2026-01-01 10:04:00,8:20,16:00,Si,No,No,,,No,No,No,,,No,No,No,,,No,No,No,,,No,No,No,No"""
+A,2026-01-01 10:00:00,8:20,16:00,Si,No,No,,,No,No,No,,,No,No,No,,,No,No,No,No
+B,2026-01-01 10:01:00,8:20,16:00,Si,No,No,,,No,No,No,,,No,No,No,,,No,No,No,No
+C,2026-01-01 10:02:00,8:20,16:00,Si,No,No,,,No,No,No,,,No,No,No,,,No,No,No,No
+D,2026-01-01 10:03:00,8:20,16:00,Si,No,No,,,No,No,No,,,No,No,No,,,No,No,No,No
+E,2026-01-01 10:04:00,8:20,16:00,Si,No,No,,,No,No,No,,,No,No,No,,,No,No,No,No"""
         
         path = crear_archivo_temporal(csv)
         try:
@@ -450,13 +450,13 @@ E,2026-01-01 10:04:00,8:20,16:00,Si,No,No,,,No,No,No,,,No,No,No,,,No,No,No,,,No,
     def test_cobertura_completa_posible(self):
         """Caso donde la cobertura completa es posible"""
         # 5 usuarios, cada uno maneja 1 vez, capacidad 5 = cubren 25 personas
-        # Pero solo son 5, así que cobertura = 100%
+        # Pero solo son 5, asÃ­ que cobertura = 100%
         csv = """Nombre,Timestamp,Lunes_Ida,Lunes_Vuelta,Lunes_Conductor,Lunes_Flex_Ida,Lunes_Flex_Vuelta,Martes_Ida,Martes_Vuelta,Martes_Conductor,Martes_Flex_Ida,Martes_Flex_Vuelta,Miercoles_Ida,Miercoles_Vuelta,Miercoles_Conductor,Miercoles_Flex_Ida,Miercoles_Flex_Vuelta,Jueves_Ida,Jueves_Vuelta,Jueves_Conductor,Jueves_Flex_Ida,Jueves_Flex_Vuelta,Viernes_Ida,Viernes_Vuelta,Viernes_Conductor,Viernes_Flex_Ida,Viernes_Flex_Vuelta,Voluntario_Segundo_Viaje
-A,2026-01-01 10:00:00,8:20,16:00,Si,No,No,,,No,No,No,,,No,No,No,,,No,No,No,,,No,No,No,No
-B,2026-01-01 10:01:00,8:20,16:00,Si,No,No,,,No,No,No,,,No,No,No,,,No,No,No,,,No,No,No,No
-C,2026-01-01 10:02:00,8:20,16:00,Si,No,No,,,No,No,No,,,No,No,No,,,No,No,No,,,No,No,No,No
-D,2026-01-01 10:03:00,8:20,16:00,Si,No,No,,,No,No,No,,,No,No,No,,,No,No,No,,,No,No,No,No
-E,2026-01-01 10:04:00,8:20,16:00,Si,No,No,,,No,No,No,,,No,No,No,,,No,No,No,,,No,No,No,No"""
+A,2026-01-01 10:00:00,8:20,16:00,Si,No,No,,,No,No,No,,,No,No,No,,,No,No,No,No
+B,2026-01-01 10:01:00,8:20,16:00,Si,No,No,,,No,No,No,,,No,No,No,,,No,No,No,No
+C,2026-01-01 10:02:00,8:20,16:00,Si,No,No,,,No,No,No,,,No,No,No,,,No,No,No,No
+D,2026-01-01 10:03:00,8:20,16:00,Si,No,No,,,No,No,No,,,No,No,No,,,No,No,No,No
+E,2026-01-01 10:04:00,8:20,16:00,Si,No,No,,,No,No,No,,,No,No,No,,,No,No,No,No"""
         
         path = crear_archivo_temporal(csv)
         try:
@@ -469,16 +469,16 @@ E,2026-01-01 10:04:00,8:20,16:00,Si,No,No,,,No,No,No,,,No,No,No,,,No,No,No,,,No,
 
 
 # =============================================================================
-# TESTS: Constantes y Configuración
+# TESTS: Constantes y ConfiguraciÃ³n
 # =============================================================================
 
 class TestConfiguracion:
-    """Tests para validar configuración"""
+    """Tests para validar configuraciÃ³n"""
     
     def test_dias_semana(self):
-        assert len(DIAS) == 5
+        assert len(DIAS) == 4
         assert 'Lunes' in DIAS
-        assert 'Viernes' in DIAS
+        assert 'Jueves' in DIAS
     
     def test_horarios_ida(self):
         assert len(HORARIOS_IDA) == 4
@@ -498,7 +498,7 @@ class TestConfiguracion:
 
 
 # =============================================================================
-# EJECUCIÓN DIRECTA
+# EJECUCIÃ“N DIRECTA
 # =============================================================================
 
 if __name__ == '__main__':
@@ -506,14 +506,14 @@ if __name__ == '__main__':
     print("EJECUTANDO TESTS UNITARIOS")
     print("=" * 70)
     
-    # Ejecutar con pytest si está disponible
+    # Ejecutar con pytest si estÃ¡ disponible
     try:
         import pytest
         pytest.main([__file__, '-v', '--tb=short'])
     except ImportError:
-        print("\nPytest no instalado. Ejecutando tests básicos manualmente...\n")
+        print("\nPytest no instalado. Ejecutando tests bÃ¡sicos manualmente...\n")
         
-        # Tests manuales básicos
+        # Tests manuales bÃ¡sicos
         tests_pasados = 0
         tests_fallidos = 0
         
@@ -521,40 +521,40 @@ if __name__ == '__main__':
         try:
             usuario = Usuario("Test", "8:20", "8:20", True, True)
             assert usuario.nombre == "Test"
-            print("✓ TestUsuario.test_crear_usuario")
+            print("âœ“ TestUsuario.test_crear_usuario")
             tests_pasados += 1
         except Exception as e:
-            print(f"✗ TestUsuario.test_crear_usuario: {e}")
+            print(f"âœ— TestUsuario.test_crear_usuario: {e}")
             tests_fallidos += 1
         
         # Test 2: BloqueHorario
         try:
             bloque = BloqueHorario(dia="Lunes", horario="8:20", tipo="ida")
             assert bloque.demanda == 0
-            print("✓ TestBloqueHorario.test_bloque_vacio")
+            print("âœ“ TestBloqueHorario.test_bloque_vacio")
             tests_pasados += 1
         except Exception as e:
-            print(f"✗ TestBloqueHorario.test_bloque_vacio: {e}")
+            print(f"âœ— TestBloqueHorario.test_bloque_vacio: {e}")
             tests_fallidos += 1
         
         # Test 3: Archivo no encontrado
         try:
             resultado = ejecutar_optimizacion('archivo_inexistente.csv')
             assert resultado['exito'] == False
-            print("✓ TestEjecutarOptimizacion.test_archivo_no_encontrado")
+            print("âœ“ TestEjecutarOptimizacion.test_archivo_no_encontrado")
             tests_pasados += 1
         except Exception as e:
-            print(f"✗ TestEjecutarOptimizacion.test_archivo_no_encontrado: {e}")
+            print(f"âœ— TestEjecutarOptimizacion.test_archivo_no_encontrado: {e}")
             tests_fallidos += 1
         
-        # Test 4: Configuración
+        # Test 4: ConfiguraciÃ³n
         try:
-            assert len(DIAS) == 5
+            assert len(DIAS) == 4
             assert CAPACIDAD_VEHICULO == 4
-            print("✓ TestConfiguracion")
+            print("âœ“ TestConfiguracion")
             tests_pasados += 1
         except Exception as e:
-            print(f"✗ TestConfiguracion: {e}")
+            print(f"âœ— TestConfiguracion: {e}")
             tests_fallidos += 1
         
         print(f"\n{'='*70}")

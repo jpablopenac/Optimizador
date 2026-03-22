@@ -40,7 +40,7 @@ logger = logging.getLogger(__name__)
 # CONFIGURACIÓN GLOBAL
 # =============================================================================
 
-DIAS = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes']
+DIAS = ['Lunes', 'Martes', 'Miercoles', 'Jueves']
 HORARIOS_IDA = ['8:20', '9:40', '11:00', '12:20']
 HORARIOS_VUELTA = ['10:50', '12:20', '13:30', '16:00', '17:20']
 # Capacidad = pasajeros que puede llevar cada conductor (sin contarlo a él)
@@ -859,6 +859,59 @@ class OptimizadorConductores:
         
         return grid
 
+    def obtener_grillas_ida_vuelta(self) -> Dict:
+        """Retorna grillas completas separadas para ida (4x5) y vuelta (5x5)."""
+        detalle_por_slot = {
+            (r.dia, r.tipo, r.horario): r
+            for r in self.resultados
+        }
+
+        grillas = {
+            'ida': {
+                'dias': DIAS,
+                'horas': HORARIOS_IDA,
+                'celdas': {dia: {} for dia in DIAS}
+            },
+            'vuelta': {
+                'dias': DIAS,
+                'horas': HORARIOS_VUELTA,
+                'celdas': {dia: {} for dia in DIAS}
+            }
+        }
+
+        for dia in DIAS:
+            for hora in HORARIOS_IDA:
+                bloque = self.bloques_ida[dia][hora]
+                resultado = detalle_por_slot.get((dia, 'ida', hora))
+                choferes = sorted(resultado.conductores_asignados) if resultado else []
+                pasajeros = sorted([u.nombre for u in bloque.usuarios if u.nombre not in set(choferes)])
+
+                grillas['ida']['celdas'][dia][hora] = {
+                    'demanda': bloque.demanda,
+                    'choferes': choferes,
+                    'pasajeros': pasajeros,
+                    'capacidad': resultado.capacidad_total if resultado else 0,
+                    'cubiertos': resultado.pasajeros_cubiertos if resultado else 0,
+                    'deficit': resultado.deficit if resultado else bloque.demanda,
+                }
+
+            for hora in HORARIOS_VUELTA:
+                bloque = self.bloques_vuelta[dia][hora]
+                resultado = detalle_por_slot.get((dia, 'vuelta', hora))
+                choferes = sorted(resultado.conductores_asignados) if resultado else []
+                pasajeros = sorted([u.nombre for u in bloque.usuarios if u.nombre not in set(choferes)])
+
+                grillas['vuelta']['celdas'][dia][hora] = {
+                    'demanda': bloque.demanda,
+                    'choferes': choferes,
+                    'pasajeros': pasajeros,
+                    'capacidad': resultado.capacidad_total if resultado else 0,
+                    'cubiertos': resultado.pasajeros_cubiertos if resultado else 0,
+                    'deficit': resultado.deficit if resultado else bloque.demanda,
+                }
+
+        return grillas
+
 
 # =============================================================================
 # FUNCIÓN PRINCIPAL DE EJECUCIÓN
@@ -938,6 +991,7 @@ def ejecutar_optimizacion(archivo_csv: str, capacidad: int = CAPACIDAD_VEHICULO)
     
     resumen = optimizador.obtener_resumen()
     grid_resultados = optimizador.obtener_grid_resultados()
+    grillas_viajes = optimizador.obtener_grillas_ida_vuelta()
     
     return {
         'exito': True,
@@ -977,6 +1031,7 @@ def ejecutar_optimizacion(archivo_csv: str, capacidad: int = CAPACIDAD_VEHICULO)
         'conductores': {
             'resumen': resumen,
             'grid_resultados': grid_resultados,
+            'grillas_viajes': grillas_viajes,
             'detalles': [
                 {
                     'dia': r.dia,

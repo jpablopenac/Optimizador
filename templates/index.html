@@ -306,7 +306,6 @@
                                 <th>Martes</th>
                                 <th>Miércoles</th>
                                 <th>Jueves</th>
-                                <th>Viernes</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -316,7 +315,6 @@
                                 <td><input type="radio" name="martes_ida" value="8:20"></td>
                                 <td><input type="radio" name="miercoles_ida" value="8:20"></td>
                                 <td><input type="radio" name="jueves_ida" value="8:20"></td>
-                                <td><input type="radio" name="viernes_ida" value="8:20"></td>
                             </tr>
                             <tr>
                                 <td class="time-cell">9:40</td>
@@ -324,7 +322,6 @@
                                 <td><input type="radio" name="martes_ida" value="9:40"></td>
                                 <td><input type="radio" name="miercoles_ida" value="9:40"></td>
                                 <td><input type="radio" name="jueves_ida" value="9:40"></td>
-                                <td><input type="radio" name="viernes_ida" value="9:40"></td>
                             </tr>
                             <tr>
                                 <td class="time-cell">11:00</td>
@@ -332,7 +329,6 @@
                                 <td><input type="radio" name="martes_ida" value="11:00"></td>
                                 <td><input type="radio" name="miercoles_ida" value="11:00"></td>
                                 <td><input type="radio" name="jueves_ida" value="11:00"></td>
-                                <td><input type="radio" name="viernes_ida" value="11:00"></td>
                             </tr>
                             <tr>
                                 <td class="time-cell">12:20</td>
@@ -340,7 +336,6 @@
                                 <td><input type="radio" name="martes_ida" value="12:20"></td>
                                 <td><input type="radio" name="miercoles_ida" value="12:20"></td>
                                 <td><input type="radio" name="jueves_ida" value="12:20"></td>
-                                <td><input type="radio" name="viernes_ida" value="12:20"></td>
                             </tr>
                         </tbody>
                     </table>
@@ -357,7 +352,6 @@
                                 <th>Martes</th>
                                 <th>Miércoles</th>
                                 <th>Jueves</th>
-                                <th>Viernes</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -367,7 +361,6 @@
                                 <td><input type="radio" name="martes_vuelta" value="10:50"></td>
                                 <td><input type="radio" name="miercoles_vuelta" value="10:50"></td>
                                 <td><input type="radio" name="jueves_vuelta" value="10:50"></td>
-                                <td><input type="radio" name="viernes_vuelta" value="10:50"></td>
                             </tr>
                             <tr>
                                 <td class="time-cell">12:20</td>
@@ -375,7 +368,6 @@
                                 <td><input type="radio" name="martes_vuelta" value="12:20"></td>
                                 <td><input type="radio" name="miercoles_vuelta" value="12:20"></td>
                                 <td><input type="radio" name="jueves_vuelta" value="12:20"></td>
-                                <td><input type="radio" name="viernes_vuelta" value="12:20"></td>
                             </tr>
                             <tr>
                                 <td class="time-cell">13:30</td>
@@ -383,7 +375,6 @@
                                 <td><input type="radio" name="martes_vuelta" value="13:30"></td>
                                 <td><input type="radio" name="miercoles_vuelta" value="13:30"></td>
                                 <td><input type="radio" name="jueves_vuelta" value="13:30"></td>
-                                <td><input type="radio" name="viernes_vuelta" value="13:30"></td>
                             </tr>
                             <tr>
                                 <td class="time-cell">16:00</td>
@@ -391,7 +382,6 @@
                                 <td><input type="radio" name="martes_vuelta" value="16:00"></td>
                                 <td><input type="radio" name="miercoles_vuelta" value="16:00"></td>
                                 <td><input type="radio" name="jueves_vuelta" value="16:00"></td>
-                                <td><input type="radio" name="viernes_vuelta" value="16:00"></td>
                             </tr>
                             <tr>
                                 <td class="time-cell">17:20</td>
@@ -399,7 +389,6 @@
                                 <td><input type="radio" name="martes_vuelta" value="17:20"></td>
                                 <td><input type="radio" name="miercoles_vuelta" value="17:20"></td>
                                 <td><input type="radio" name="jueves_vuelta" value="17:20"></td>
-                                <td><input type="radio" name="viernes_vuelta" value="17:20"></td>
                             </tr>
                         </tbody>
                     </table>
@@ -477,22 +466,6 @@
                         </div>
                     </div>
 
-                    <!-- Viernes -->
-                    <div class="day-header">Viernes</div>
-                    <div class="checkbox-row">
-                        <div class="checkbox-group">
-                            <input type="checkbox" id="viernes_flex_ida" name="viernes_flex_ida">
-                            <label for="viernes_flex_ida">Permite ida flexible</label>
-                        </div>
-                        <div class="checkbox-group">
-                            <input type="checkbox" id="viernes_flex_vuelta" name="viernes_flex_vuelta">
-                            <label for="viernes_flex_vuelta">Permite vuelta flexible</label>
-                        </div>
-                        <div class="checkbox-group">
-                            <input type="checkbox" id="viernes_conductor" name="viernes_conductor">
-                            <label for="viernes_conductor">Dispuesto a manejar</label>
-                        </div>
-                    </div>
                 </div>
 
                 <!-- Voluntario segundo viaje -->
@@ -523,7 +496,7 @@
             }
 
             // Validar que si marca conductor, tenga ida y vuelta
-            const dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
+            const dias = ['lunes', 'martes', 'miercoles', 'jueves'];
             let validationPassed = true;
 
             dias.forEach(dia => {
