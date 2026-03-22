@@ -459,12 +459,20 @@ class ConsolidadorDemanda:
                 'datos': matriz_ida.values.tolist(),
                 'filas': HORARIOS_IDA,
                 'columnas': DIAS,
+                # Compatibilidad con plantilla actual (resultados.html)
+                'matrix': matriz_ida.values.tolist(),
+                'horas': HORARIOS_IDA,
+                'dias': DIAS,
                 'max_valor': int(matriz_ida.max().max()) if not matriz_ida.empty else 0
             },
             'vuelta': {
                 'datos': matriz_vuelta.values.tolist(),
                 'filas': HORARIOS_VUELTA,
                 'columnas': DIAS,
+                # Compatibilidad con plantilla actual (resultados.html)
+                'matrix': matriz_vuelta.values.tolist(),
+                'horas': HORARIOS_VUELTA,
+                'dias': DIAS,
                 'max_valor': int(matriz_vuelta.max().max()) if not matriz_vuelta.empty else 0
             }
         }

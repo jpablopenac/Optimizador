@@ -197,6 +197,80 @@
             word-break: break-word;
         }
 
+        .rol-value.drop-zone {
+            min-height: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+            border-radius: 6px;
+            padding: 2px;
+            transition: background-color 0.2s, box-shadow 0.2s;
+        }
+
+        .rol-value.drop-zone.drag-over {
+            background: rgba(79, 172, 254, 0.14);
+            box-shadow: inset 0 0 0 1px rgba(79, 172, 254, 0.55);
+        }
+
+        .persona-chip {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 8px;
+            border-radius: 999px;
+            background: #ffffff;
+            border: 1px solid #d6deee;
+            font-size: 0.83em;
+            color: #253152;
+            cursor: grab;
+            user-select: none;
+        }
+
+        .persona-chip:active {
+            cursor: grabbing;
+        }
+
+        .persona-chip.dragging {
+            opacity: 0.4;
+        }
+
+        .placeholder-chip {
+            font-size: 0.85em;
+            color: #7a869d;
+        }
+
+        .visual-mode-note {
+            margin: 0 0 12px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            background: #f0f6ff;
+            border: 1px solid #c8defd;
+            color: #2f4d7e;
+            font-size: 0.9em;
+        }
+
+        .visual-note-actions {
+            margin-top: 8px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .mini-btn {
+            border: 1px solid #93b9f1;
+            background: #ffffff;
+            color: #2f4d7e;
+            border-radius: 999px;
+            padding: 6px 12px;
+            font-size: 0.82em;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .mini-btn:hover {
+            background: #eef5ff;
+        }
+
         .day-title {
             margin: 25px 0 12px;
             font-size: 1.25em;
@@ -402,6 +476,12 @@
                 </div>
                 <div class="conductores-section">
                     {% if conductores.grillas_viajes %}
+                    <div class="visual-mode-note">
+                        Modo visual: puedes arrastrar nombres entre celdas para simular cambios. Esto no modifica datos reales ni se guarda.
+                        <div class="visual-note-actions">
+                            <button type="button" id="restore-visual-grid" class="mini-btn">Restaurar vista original</button>
+                        </div>
+                    </div>
                     <div id="grid-ida-container">
                     <div class="agenda-title">🚌 Grilla de Ida (4 turnos x 4 dias)</div>
                     <table class="agenda-table">
@@ -424,11 +504,27 @@
                                         <div class="agenda-meta">Demanda: {{ celda.demanda }} · Capacidad: {{ celda.capacidad }} · Deficit: {{ celda.deficit }}</div>
                                         <div class="rol-box {% if celda.choferes %}chofer-activo{% endif %}">
                                             <span class="rol-label">Chofer</span>
-                                            <div class="rol-value">{{ celda.choferes|join(', ') if celda.choferes else '—' }}</div>
+                                            <div class="rol-value drop-zone" data-role="chofer">
+                                                {% if celda.choferes %}
+                                                    {% for nombre in celda.choferes %}
+                                                    <span class="persona-chip" draggable="true">{{ nombre }}</span>
+                                                    {% endfor %}
+                                                {% else %}
+                                                    <span class="placeholder-chip">—</span>
+                                                {% endif %}
+                                            </div>
                                         </div>
                                         <div class="rol-box {% if celda.pasajeros and not celda.choferes %}pasajero-sin-chofer{% elif celda.pasajeros %}pasajero-ok{% endif %}">
                                             <span class="rol-label">Pasajero</span>
-                                            <div class="rol-value">{{ celda.pasajeros|join(', ') if celda.pasajeros else '—' }}</div>
+                                            <div class="rol-value drop-zone" data-role="pasajero">
+                                                {% if celda.pasajeros %}
+                                                    {% for nombre in celda.pasajeros %}
+                                                    <span class="persona-chip" draggable="true">{{ nombre }}</span>
+                                                    {% endfor %}
+                                                {% else %}
+                                                    <span class="placeholder-chip">—</span>
+                                                {% endif %}
+                                            </div>
                                         </div>
                                     </div>
                                 </td>
@@ -464,11 +560,27 @@
                                         <div class="agenda-meta">Demanda: {{ celda.demanda }} · Capacidad: {{ celda.capacidad }} · Deficit: {{ celda.deficit }}</div>
                                         <div class="rol-box {% if celda.choferes %}chofer-activo{% endif %}">
                                             <span class="rol-label">Chofer</span>
-                                            <div class="rol-value">{{ celda.choferes|join(', ') if celda.choferes else '—' }}</div>
+                                            <div class="rol-value drop-zone" data-role="chofer">
+                                                {% if celda.choferes %}
+                                                    {% for nombre in celda.choferes %}
+                                                    <span class="persona-chip" draggable="true">{{ nombre }}</span>
+                                                    {% endfor %}
+                                                {% else %}
+                                                    <span class="placeholder-chip">—</span>
+                                                {% endif %}
+                                            </div>
                                         </div>
                                         <div class="rol-box {% if celda.pasajeros and not celda.choferes %}pasajero-sin-chofer{% elif celda.pasajeros %}pasajero-ok{% endif %}">
                                             <span class="rol-label">Pasajero</span>
-                                            <div class="rol-value">{{ celda.pasajeros|join(', ') if celda.pasajeros else '—' }}</div>
+                                            <div class="rol-value drop-zone" data-role="pasajero">
+                                                {% if celda.pasajeros %}
+                                                    {% for nombre in celda.pasajeros %}
+                                                    <span class="persona-chip" draggable="true">{{ nombre }}</span>
+                                                    {% endfor %}
+                                                {% else %}
+                                                    <span class="placeholder-chip">—</span>
+                                                {% endif %}
+                                            </div>
                                         </div>
                                     </div>
                                 </td>
@@ -500,6 +612,84 @@
 
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <script>
+        let draggedChip = null;
+        let grillasOriginales = null;
+
+        function limpiarPlaceholder(zone) {
+            const placeholder = zone.querySelector('.placeholder-chip');
+            if (placeholder) {
+                placeholder.remove();
+            }
+        }
+
+        function asegurarPlaceholder(zone) {
+            if (!zone.querySelector('.persona-chip')) {
+                zone.innerHTML = '<span class="placeholder-chip">—</span>';
+            }
+        }
+
+        function habilitarDragVisual() {
+            const chips = document.querySelectorAll('.persona-chip');
+            const zones = document.querySelectorAll('.rol-value.drop-zone');
+
+            chips.forEach((chip) => {
+                chip.addEventListener('dragstart', () => {
+                    draggedChip = chip;
+                    chip.classList.add('dragging');
+                });
+
+                chip.addEventListener('dragend', () => {
+                    chip.classList.remove('dragging');
+                    draggedChip = null;
+                });
+            });
+
+            zones.forEach((zone) => {
+                zone.addEventListener('dragover', (event) => {
+                    event.preventDefault();
+                    zone.classList.add('drag-over');
+                });
+
+                zone.addEventListener('dragleave', () => {
+                    zone.classList.remove('drag-over');
+                });
+
+                zone.addEventListener('drop', (event) => {
+                    event.preventDefault();
+                    zone.classList.remove('drag-over');
+
+                    if (!draggedChip) {
+                        return;
+                    }
+
+                    const origen = draggedChip.parentElement;
+                    if (!origen || origen === zone) {
+                        return;
+                    }
+
+                    limpiarPlaceholder(zone);
+                    zone.appendChild(draggedChip);
+                    asegurarPlaceholder(origen);
+                });
+            });
+        }
+
+        function restaurarVistaOriginal() {
+            if (!grillasOriginales) {
+                return;
+            }
+
+            const ida = document.getElementById('grid-ida-container');
+            const vuelta = document.getElementById('grid-vuelta-container');
+
+            if (ida && vuelta) {
+                ida.innerHTML = grillasOriginales.ida;
+                vuelta.innerHTML = grillasOriginales.vuelta;
+                draggedChip = null;
+                habilitarDragVisual();
+            }
+        }
+
         function descargarGrid(containerId, nombreArchivo) {
             const contenedor = document.getElementById(containerId);
             if (!contenedor) {
@@ -520,6 +710,25 @@
                 alert('No se pudo generar la imagen. Intenta nuevamente.');
             });
         }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const ida = document.getElementById('grid-ida-container');
+            const vuelta = document.getElementById('grid-vuelta-container');
+            const restoreBtn = document.getElementById('restore-visual-grid');
+
+            if (ida && vuelta) {
+                grillasOriginales = {
+                    ida: ida.innerHTML,
+                    vuelta: vuelta.innerHTML
+                };
+            }
+
+            if (restoreBtn) {
+                restoreBtn.addEventListener('click', restaurarVistaOriginal);
+            }
+
+            habilitarDragVisual();
+        });
     </script>
 </body>
 </html>
