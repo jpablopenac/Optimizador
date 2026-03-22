@@ -1,13 +1,13 @@
 Nombre,Timestamp,Lunes_Ida,Lunes_Vuelta,Lunes_Conductor,Lunes_Flex_Ida,Lunes_Flex_Vuelta,Martes_Ida,Martes_Vuelta,Martes_Conductor,Martes_Flex_Ida,Martes_Flex_Vuelta,Miercoles_Ida,Miercoles_Vuelta,Miercoles_Conductor,Miercoles_Flex_Ida,Miercoles_Flex_Vuelta,Jueves_Ida,Jueves_Vuelta,Jueves_Conductor,Jueves_Flex_Ida,Jueves_Flex_Vuelta,Voluntario_Segundo_Viaje
-Juan Pablo P,2026-03-22 13:54:54,8:20,12:20,Si,No,No,11:00,16:00,Si,Si,No,8:20,17:20,Si,No,No,11:00,17:20,Si,Si,No,No
-Jose M,2026-03-22 13:54:56,9:40,13:30,No,No,No,9:40,10:50,Si,No,No,9:40,17:20,Si,No,No,9:40,10:50,No,No,No,No
+Juan Pablo P,2026-03-22 14:05:24,8:20,12:20,Si,No,Si,11:00,16:00,Si,Si,No,8:20,17:20,Si,No,No,11:00,17:20,Si,Si,No,No
+Jose M,2026-03-22 14:06:46,9:40,13:30,No,No,No,9:40,10:50,Si,No,No,9:40,17:20,Si,No,No,9:40,13:30,No,No,No,No
 Lucas P,2026-03-22 13:54:59,8:20,13:30,Si,No,No,8:20,13:30,Si,No,No,8:20,13:30,Si,No,No,8:20,17:20,Si,No,No,No
-Vicente G-H,2026-03-22 13:55:02,9:40,12:20,No,No,No,9:40,16:00,Si,No,No,9:40,12:20,Si,No,No,9:40,16:00,Si,No,No,No
-Cristobal A,2026-03-22 13:55:25,9:40,13:30,Si,No,No,8:20,10:50,Si,No,No,9:40,13:30,Si,No,No,8:20,10:50,Si,No,No,No
-Juan Diego A,2026-03-22 13:55:52,11:00,13:30,Si,No,No,11:00,16:00,Si,No,No,11:00,13:30,Si,No,No,8:20,16:00,Si,No,No,No
+Vicente G-H,2026-03-22 14:06:07,9:40,12:20,No,No,Si,9:40,16:00,Si,No,No,9:40,12:20,Si,No,Si,9:40,16:00,Si,No,No,No
+Cristobal A,2026-03-22 14:06:35,9:40,13:30,Si,No,No,8:20,10:50,Si,No,No,9:40,13:30,Si,No,No,8:20,13:30,Si,No,No,No
+Juan Diego A,2026-03-22 14:04:59,11:00,13:30,Si,Si,No,11:00,16:00,Si,No,No,11:00,13:30,Si,No,No,8:20,16:00,Si,No,No,No
 Jacinta L,2026-03-22 13:56:19,,,No,No,No,8:20,10:50,Si,No,No,8:20,13:30,Si,No,No,11:00,,No,No,No,No
-Catalina T,2026-03-22 13:56:46,8:20,13:30,No,No,No,8:20,12:20,No,No,No,8:20,13:30,No,No,No,8:20,13:30,Si,No,No,No
+Catalina T,2026-03-22 14:05:58,8:20,13:30,No,No,No,8:20,12:20,No,No,Si,8:20,13:30,No,No,No,8:20,13:30,Si,No,No,No
 Juan Pablo F,2026-03-22 13:57:01,8:20,13:30,Si,No,No,8:20,17:20,Si,No,No,8:20,13:30,Si,No,No,,,No,No,No,No
-Pablo L,2026-03-22 13:57:22,9:40,16:00,Si,No,No,9:40,13:30,Si,No,No,9:40,13:30,Si,No,No,9:40,17:20,Si,No,No,No
-Maida S,2026-03-22 13:58:00,,,No,No,No,11:00,16:00,Si,No,No,,,No,No,No,12:20,13:30,Si,No,No,No
+Pablo L,2026-03-22 14:05:41,9:40,17:20,Si,No,No,9:40,13:30,Si,No,No,9:40,13:30,Si,No,No,9:40,17:20,Si,No,No,No
+Maida S,2026-03-22 14:05:09,,,No,No,No,11:00,16:00,Si,No,No,,,No,No,No,12:20,13:30,Si,Si,No,No
 Gracia L,2026-03-15 10:01:00,8:20,17:20,No,No,No,8:20,17:20,No,No,No,8:20,,No,No,No,8:20,17:20,No,No,No,No

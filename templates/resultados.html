@@ -165,6 +165,21 @@
             padding: 7px;
         }
 
+        .rol-box.chofer-activo {
+            background: #eaf8ef;
+            border-color: #8fd2a8;
+        }
+
+        .rol-box.pasajero-ok {
+            background: #eaf3ff;
+            border-color: #9dc2f6;
+        }
+
+        .rol-box.pasajero-sin-chofer {
+            background: #ffeaea;
+            border-color: #ee9b9b;
+        }
+
         .rol-label {
             display: block;
             font-size: 0.78em;
@@ -407,11 +422,11 @@
                                 <td>
                                     <div class="agenda-slot">
                                         <div class="agenda-meta">Demanda: {{ celda.demanda }} · Capacidad: {{ celda.capacidad }} · Deficit: {{ celda.deficit }}</div>
-                                        <div class="rol-box">
+                                        <div class="rol-box {% if celda.choferes %}chofer-activo{% endif %}">
                                             <span class="rol-label">Chofer</span>
                                             <div class="rol-value">{{ celda.choferes|join(', ') if celda.choferes else '—' }}</div>
                                         </div>
-                                        <div class="rol-box">
+                                        <div class="rol-box {% if celda.pasajeros and not celda.choferes %}pasajero-sin-chofer{% elif celda.pasajeros %}pasajero-ok{% endif %}">
                                             <span class="rol-label">Pasajero</span>
                                             <div class="rol-value">{{ celda.pasajeros|join(', ') if celda.pasajeros else '—' }}</div>
                                         </div>
@@ -447,11 +462,11 @@
                                 <td>
                                     <div class="agenda-slot">
                                         <div class="agenda-meta">Demanda: {{ celda.demanda }} · Capacidad: {{ celda.capacidad }} · Deficit: {{ celda.deficit }}</div>
-                                        <div class="rol-box">
+                                        <div class="rol-box {% if celda.choferes %}chofer-activo{% endif %}">
                                             <span class="rol-label">Chofer</span>
                                             <div class="rol-value">{{ celda.choferes|join(', ') if celda.choferes else '—' }}</div>
                                         </div>
-                                        <div class="rol-box">
+                                        <div class="rol-box {% if celda.pasajeros and not celda.choferes %}pasajero-sin-chofer{% elif celda.pasajeros %}pasajero-ok{% endif %}">
                                             <span class="rol-label">Pasajero</span>
                                             <div class="rol-value">{{ celda.pasajeros|join(', ') if celda.pasajeros else '—' }}</div>
                                         </div>
